@@ -32,7 +32,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 		visit.visit_type=statement.getInt32(4);
 		visit.url=statement.getString(5);
 		visit.label=statement.getString(6);
-		console.log(JSON.stringify(visit));
+		//console.log(JSON.stringify(visit));
 		visits.push(visit);
       }
       statement.reset();
@@ -58,7 +58,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  	visitAfter = visits[i-1];
   	  	if(visitAfter.visit_type==5 || visitAfter.visit_type==6){
   	  	//i--,visitAfter = visits[i-1])
-  	  		console.log(visitAfter.id+"<-"+visitAfter.from_visit+" to "+visitAfter.id+"<-"+visit.from_visit);
+  	  		//console.log(visitAfter.id+"<-"+visitAfter.from_visit+" to "+visitAfter.id+"<-"+visit.from_visit);
   	  		visitAfter.from_visit=visit.from_visit;
   	  		continue;
   	  	}
@@ -66,7 +66,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  
   	  //if follow a link, visit_type=1
   	  var fromVisit = mapId[visit.from_visit];
-  	  console.log("fromVisit:"+fromVisit);
+  	  //console.log("fromVisit:"+fromVisit);
   	  if(fromVisit!=null){
   	    visit.level=fromVisit.level+1;
   	    fromVisit.isContainer=true;
@@ -75,7 +75,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	    fromVisit.children.push(visit);
   	  }//otherwise 2 - type/autocomplate; 3 - click on bookmark; 4 - embedded url
   	  else{
-  	  	console.log(visit);
+  	  	//console.log(visit);
   	    visit.level=0;
   	    tops.push(visit);
   	  }
