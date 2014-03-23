@@ -1,0 +1,38 @@
+<!ENTITY mainMenu.search "Search History">
+<!ENTITY mainMenu.recommend "Auto-refresh Suggestion">
+
+<!ENTITY contextMenu.switchToTab "Switch to Tab">
+<!ENTITY contextMenu.openinnewtab "Open Page in New Tab">
+<!ENTITY contextMenu.openlocalcopy "Open Local Copy">
+<!ENTITY contextMenu.export "Export as ...">
+<!ENTITY contextMenu.formatJSON "JSON">
+<!ENTITY contextMenu.formatHTML "HTML">
+<!ENTITY contextMenu.import "Import from ...">
+<!ENTITY contextMenu.saveNodetoLocal "Save to Local Notes">
+<!ENTITY contextMenu.showLocalNotes "Open/close Notes Sidebar">
+<!ENTITY contextMenu.openlocalnote "Open Note">
+<!ENTITY contextMenu.delete "Delete">
+<!ENTITY contextMenu.share "Share the Selected">
+<!ENTITY contextMenu.shareWithWorld "with ENTIRE world">
+<!ENTITY contextMenu.seeWeb "Search Online">
+
+<!ENTITY related.contextMenu.reverse "Reverse Order in Frequency">
+<!ENTITY related.contextMenu.more "More...">
+
+<!ENTITY button.searchallwords "Search">
+<!ENTITY button.findNext "Find Next">
+
+<!ENTITY notesidebar.title "Local Notes">
+<!ENTITY table.title "Name">
+<!ENTITY table.url "Location">
+<!ENTITY table.date "Last Visit">
+<!ENTITY note.savedate "Save Date">
+
+<!ENTITY option.pane.general "General">
+<!ENTITY option.pane.search "Search">
+<!ENTITY option.tbButtonAction "Toolbar Button Action">
+<!ENTITY option.none "None">
+<!ENTITY option.searchHistory "Search History">
+<!ENTITY option.toggleSugPanel "Show/hide Suggestion Panel">
+<!ENTITY option.related.showRelatedKeywords "Show Related Keywords">
+<!ENTITY option.related.highFrequency "High Frequency Largest">

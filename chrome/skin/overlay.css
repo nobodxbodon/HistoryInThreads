@@ -1,0 +1,8 @@
+@import url(chrome://global/skin/);
+
+@namespace
+  url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+treeChildren::-moz-tree-image(title, container) {
+   list-style-image: url("chrome://history_in_threads/content/toolbar_button/icon.png");
+} 

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE overlay SYSTEM "chrome://history_in_threads/locale/hit.dtd">
+<?xml-stylesheet href="chrome://history_in_threads/skin/overlay.css" type="text/css"?>  
+
+<window onload="com.wuxuan.fromwheretowhere.mainView.init(com.wuxuan.fromwheretowhere.main);"  
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:html="http://www.w3.org/1999/xhtml">  
+
+<hbox>
+  <textbox id="keywords" multiline="false" flex="1" onkeypress="com.wuxuan.fromwheretowhere.main.keypress(event)"/>
+  <button id="bsearch" label="&button.searchallwords;"
+      oncommand="com.wuxuan.fromwheretowhere.main.search()">
+  </button>
+</hbox>
+
+<tree id="elementList" flex="1">  
+  <treecols>  
+    <treecol id="element" label="&table.title;" primary="true" flex="4"/>
+       <splitter resizeafter="closest">
+      </splitter>
+    <treecol id="url" label="&table.url;" hidden="true" flex="3"/>
+      <splitter resizeafter="closest">
+      </splitter>
+     <treecol id="date" label="&table.date;" flex="1"/>
+  </treecols>
+  <treechildren context="clipmenu" ondblclick="com.wuxuan.fromwheretowhere.main.doubleClickTreeItem()"/>  
+</tree>  
+
+<script src="namespace.js" />
+<script src="treeview.js" />
+<script src="main.js" />
+<script src="historyQuery.js" />
+<script src="utils.js" />
+</window>  
