@@ -4,7 +4,8 @@ com.wuxuan.fromwheretowhere.main = function(){
 
 	// Get a reference to the strings bundle
   //pub.stringsBundle = document.getElementById("fromwheretowhere.string-bundle");
-	
+  pub.TODAY = 'today';
+  
   pub.getCurrentURI = function() {
     if(!window.opener){
       return "none";
@@ -199,12 +200,12 @@ pub.mainThread.prototype = {
   pub.searchThread.prototype = {
     run: function() {
       try {
-      	console.log("in search thread");
-				var querytime = {};
+      	
+		var querytime = {};
         var topNodes = [];
         //if(this.words.length!=0 ||  this.optional.length!=0){
           
-          var visits = pub.history.getAllVisits();
+          var visits = pub.history.getAllVisits(this.time);
           topNodes = pub.history.getThreads(visits).reverse(); //need to reverse to get the latest visits on top
           console.log("got tops:"+topNodes.length);
           
@@ -234,15 +235,47 @@ pub.mainThread.prototype = {
   };
   
   pub.search = function() {
+  
+  	var periodOptions = document.getElementsByTagName("menuitem");
+  	console.log(periodOptions.length);
+  	var period = 'noidea';
+  	for(var i=0;i<periodOptions.length;i++){
+  		if(periodOptions[i].checked=true){
+  			period=periodOptions[i].id;
+  			break;
+  		}
+  	}
+    console.log("search with period:"+JSON.stringify(period));
     //alert(Application.storage.get("currentPage", false));
-    /*pub.treeView.treeBox.rowCountChanged(0, -pub.treeView.visibleData.length);
-    pub.treeView.addSuspensionPoints(-1, -1);*/
+    pub.treeView.treeBox.rowCountChanged(0, -pub.treeView.visibleData.length);
+    pub.treeView.addSuspensionPoints(-1, -1);
     pub.keywords = document.getElementById("keywords").value;
 		pub.query = pub.utils.getIncludeExcluded(pub.keywords);
+	pub.query.time=pub.getTime(period);
+	console.log(pub.query.time);
     pub.main.dispatch(new pub.searchThread(1, pub.query), pub.main.DISPATCH_NORMAL);
     Application.storage.set("currentURI", "");
   };
 
+  pub.getTime = function(period) {
+  	console.log("start getTime:"+period);
+    var p = {since: -1, till: Number.MAX_VALUE};
+  	if(period==pub.TODAY){
+  	  p.since=pub.getTodayStartTime();
+  	}
+  	console.log("in getTime:"+p);
+  	return p;
+  };
+  
+  pub.getTodayStartTime = function() {
+  	var now=new Date();
+  	var hour = now.getHours();
+	var milli = now.getMilliseconds();
+    var min = now.getMinutes();
+    var sec = now.getSeconds();
+    return (now-((60*hour+min)*60+sec)*1000+milli)*1000;
+  };
+  
 	pub.findNext = function(){
 		//pub.treeView.toggleOpenState(0);
 		pub.treeView.findNext();

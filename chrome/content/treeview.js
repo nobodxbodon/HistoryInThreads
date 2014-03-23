@@ -203,11 +203,13 @@ com.wuxuan.fromwheretowhere.mainView = function(){
   getImageSrc: function(idx, column) {
   	
     var vis = this.visibleData;
-    var treeItem = this.view.getItemAtIndex(idx);
+    /*var treeItem = this.view.getItemAtIndex(idx);
     if(column.id == "element") {
       main.history.getImagefromUrl(vis[idx].url, treeItem);
-    }
-  	return "";
+    }*/
+    if(column.id == "element") {
+  		return vis[idx].icon;
+  	}
   },
   
   getProgressMode : function(idx,column) {},  

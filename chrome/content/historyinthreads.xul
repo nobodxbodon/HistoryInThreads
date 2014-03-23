@@ -7,6 +7,18 @@
         xmlns:html="http://www.w3.org/1999/xhtml">  
 
 <hbox>
+  <menu id="period_menu" label="Time">
+      <menupopup>
+        <menuitem id="today" label="Today" type="checkbox" checked="true"
+        	oncommand="com.wuxuan.fromwheretowhere.main.search('today')"/>
+        <menuitem id="yesterday" label="Yesterday" type="checkbox"/>
+        <menuitem id="last7days" label="Last 7 Days" type="checkbox"/>
+        <menuitem id="thismonth" label="This Month" type="checkbox"/>
+        <menuitem id="thisyear" label="This Year" type="checkbox"/>
+        <menuitem id="all" label="All" type="checkbox"/>
+      </menupopup>
+    </menu>
+    
   <textbox id="keywords" multiline="false" flex="1" onkeypress="com.wuxuan.fromwheretowhere.main.keypress(event)"/>
   <button id="bsearch" label="&button.searchallwords;"
       oncommand="com.wuxuan.fromwheretowhere.main.search()">

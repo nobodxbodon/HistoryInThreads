@@ -18,10 +18,44 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   pub.fis = Components.classes["@mozilla.org/browser/favicon-service;1"].
           getService(Components.interfaces.nsIFaviconService);
   
-  pub.getAllVisits = function(){
-      console.log("in getAllVisits");
+  
+  pub.histServ =
+  	Components.classes["@mozilla.org/browser/nav-history-service;1"].
+  	getService(Components.interfaces.nsINavHistoryService);
+
+  pub.getAllVisits = function(time){
+  
+  	var opts = pub.histServ.getNewQueryOptions();
+	var query = pub.histServ.getNewQuery();
+	query.absoluteBeginTime = time.since;
+	var result = pub.histServ.executeQuery(query, opts);
+    
+    // Using the results by traversing a container
+	// see : https://developer.mozilla.org/en/nsINavHistoryContainerResultNode
+	var cont = result.root;
+    cont.containerOpen = true;
+	var mapIcon = {};
+	for (var i = 0; i < cont.childCount; i ++) {
+
+    	var node = cont.getChild(i);
+	
+    	// "node" attributes contains the information (e.g. URI, title, time, icon...)
+   		// see : https://developer.mozilla.org/en/nsINavHistoryResultNode
+    	//console.log(node.icon+" "+node.uri+" "+node.title);
+		mapIcon[node.uri]=node.icon;
+	}
+    // Close container when done
+    // see : https://developer.mozilla.org/en/nsINavHistoryContainerResultNode
+    cont.containerOpen = false;
+    
+    console.log("in getAllVisits, time:"+JSON.stringify(time));
   	var visits = [];
-  	var statement = pub.mDBConn.createStatement("SELECT hv.id, hv.from_visit, hv.place_id, hv.visit_date, hv.visit_type, p.url, p.title FROM moz_historyvisits hv join moz_places p on hv.place_id=p.id order by hv.visit_date desc limit 43");
+  	var range = pub.buildPeriodTerm(time, 'hv.visit_date');
+  	if(range!="")
+  		range=" where "+range;
+  	var term = "SELECT hv.id, hv.from_visit, hv.place_id, hv.visit_date, hv.visit_type, p.url, p.title FROM moz_historyvisits hv join moz_places p on hv.place_id=p.id" + range + " order by hv.visit_date desc";
+  	console.log("search term:"+term);
+  	var statement = pub.mDBConn.createStatement(term);
     try {
       while (statement.executeStep()) {
 		var visit={};
@@ -31,6 +65,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 		visit.visit_date=statement.getInt64(3);
 		visit.visit_type=statement.getInt32(4);
 		visit.url=statement.getString(5);
+		visit.icon=mapIcon[visit.url];
 		visit.label=statement.getString(6);
 		//console.log(JSON.stringify(visit));
 		visits.push(visit);
@@ -40,8 +75,20 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
       return visits;  
     } 
     catch (e) {
+      console.log("error in getAllvisits:"+JSON.stringify(e));
       statement.reset();
     }
+  };
+  
+  pub.buildPeriodTerm = function(time, field){
+  	var term = "";
+  	if(time.since!=-1){
+  		term+=field+">="+time.since;
+  	}
+  	if(time.till!=Number.MAX_VALUE){
+  		term+=" AND "+field+"<="+time.till;
+  	}
+  	return term;
   };
   
   /* for latest visits ordered by latest first, walk them from the earliest, add it to the node based on from_visit, order by visit time*/
