@@ -28,6 +28,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	var opts = pub.histServ.getNewQueryOptions();
 	var query = pub.histServ.getNewQuery();
 	query.absoluteBeginTime = time.since;
+	query.absoluteEndTime = time.till;
 	var result = pub.histServ.executeQuery(query, opts);
     
     // Using the results by traversing a container

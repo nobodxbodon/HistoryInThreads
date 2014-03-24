@@ -1,7 +1,9 @@
 content history_in_threads chrome/content/
 
 # Stylesheets
-style	chrome://browser/content/browser.xul chrome://history_in_threads/../skin/overlay.css
+style	chrome://browser/content/browser.xul chrome://history_in_threads/skin/overlay.css
 
 
 locale history_in_threads en-US chrome/locale/en-US/
+
+skin history_in_threads classic/1.0 chrome/skin/

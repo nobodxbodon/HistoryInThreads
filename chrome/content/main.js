@@ -4,7 +4,13 @@ com.wuxuan.fromwheretowhere.main = function(){
 
 	// Get a reference to the strings bundle
   //pub.stringsBundle = document.getElementById("fromwheretowhere.string-bundle");
+  pub.DAYTIME=(24*60*60*1000000);
   pub.TODAY = 'today';
+  pub.YESTERDAY = 'yesterday';
+  pub.LAST7DAYS = 'last7days';
+  pub.THISMONTH = 'thismonth';
+  pub.THISYEAR = 'thisyear';
+  pub.ALL = 'all';
   
   pub.getCurrentURI = function() {
     if(!window.opener){
@@ -234,17 +240,12 @@ pub.mainThread.prototype = {
     }
   };
   
-  pub.search = function() {
+  pub.search = function(event) {
   
-  	var periodOptions = document.getElementsByTagName("menuitem");
-  	console.log(periodOptions.length);
-  	var period = 'noidea';
-  	for(var i=0;i<periodOptions.length;i++){
-  		if(periodOptions[i].checked=true){
-  			period=periodOptions[i].id;
-  			break;
-  		}
-  	}
+  	
+  	var period = pub.TODAY;
+  	if(event!=null)
+  		period = event.target.getAttribute("id");
     console.log("search with period:"+JSON.stringify(period));
     //alert(Application.storage.get("currentPage", false));
     pub.treeView.treeBox.rowCountChanged(0, -pub.treeView.visibleData.length);
@@ -262,6 +263,19 @@ pub.mainThread.prototype = {
     var p = {since: -1, till: Number.MAX_VALUE};
   	if(period==pub.TODAY){
   	  p.since=pub.getTodayStartTime();
+  	}else if(period==pub.YESTERDAY){
+  	  p.till=pub.getTodayStartTime();
+  	  p.since=p.till-pub.DAYTIME;
+  	}else if(period==pub.LAST7DAYS){
+  	  p.since=pub.getTodayStartTime()-pub.DAYTIME*7;
+  	}else if(period==pub.THISMONTH){
+  	  var date = new Date();
+  	  var year = date.getFullYear();
+  	  var month = date.getMonth();
+  	  p.since=new Date(year,month,1)*1000;
+  	}else if(period==pub.THISYEAR){
+  	  var year = new Date().getFullYear();
+  	  p.since=new Date(year,0,1)*1000;
   	}
   	console.log("in getTime:"+p);
   	return p;
