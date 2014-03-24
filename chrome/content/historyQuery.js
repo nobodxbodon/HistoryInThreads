@@ -23,12 +23,13 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	Components.classes["@mozilla.org/browser/nav-history-service;1"].
   	getService(Components.interfaces.nsINavHistoryService);
 
-  pub.getAllVisits = function(time){
-  
+  pub.getAllVisits = function(searchterm, time){
+  	console.log("get visits by words:"+searchterm);
   	var opts = pub.histServ.getNewQueryOptions();
 	var query = pub.histServ.getNewQuery();
 	query.absoluteBeginTime = time.since;
 	query.absoluteEndTime = time.till;
+	
 	var result = pub.histServ.executeQuery(query, opts);
     
     // Using the results by traversing a container
@@ -45,9 +46,33 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
     	//console.log(node.icon+" "+node.uri+" "+node.title);
 		mapIcon[node.uri]=node.icon;
 	}
+	
+	var mapTerm = {};
+	//get nodes with searchterm
+    if(searchterm!=""){
+    var query2 = pub.histServ.getNewQuery();
+	query2.absoluteBeginTime = time.since;
+	query2.absoluteEndTime = time.till;
+    query2.searchTerms=searchterm;
+    var withTerm = pub.histServ.executeQuery(query2, opts);
+    
+	//get those with term
+	cont = withTerm.root;
+    cont.containerOpen = true;
+	for (var i = 0; i < cont.childCount; i ++) {
+
+    	var node = cont.getChild(i);
+	
+    	// "node" attributes contains the information (e.g. URI, title, time, icon...)
+   		// see : https://developer.mozilla.org/en/nsINavHistoryResultNode
+    	//console.log(node.icon+" "+node.uri+" "+node.title);
+		mapTerm[node.time]=true;
+	}
+	
     // Close container when done
     // see : https://developer.mozilla.org/en/nsINavHistoryContainerResultNode
     cont.containerOpen = false;
+    }
     
     console.log("in getAllVisits, time:"+JSON.stringify(time));
   	var visits = [];
@@ -67,6 +92,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 		visit.visit_type=statement.getInt32(4);
 		visit.url=statement.getString(5);
 		visit.icon=mapIcon[visit.url];
+		visit.hasSearchTerm=mapTerm[visit.visit_date];
 		visit.label=statement.getString(6);
 		//console.log(JSON.stringify(visit));
 		visits.push(visit);
@@ -93,7 +119,8 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   };
   
   /* for latest visits ordered by latest first, walk them from the earliest, add it to the node based on from_visit, order by visit time*/
-  pub.getThreads = function(visits){
+  pub.getThreads = function(searchterm, time){
+    var visits = pub.getAllVisits(searchterm, time);
 	var mapId = {};
 	var tops = [];
 	var visit = null;
@@ -130,9 +157,33 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  //add to visit_id
   	  mapId[visit.id]=visit;
   	}
+  	//TODO: remove those without keywords (marked by flag)
+  	if(searchterm!=""){
+  	  for(var i=0;i<tops.length;i++){
+  	    if(!pub.hasSearchTerm(tops[i])){
+  	      console.log("remove:"+tops[i].label);
+    	  tops.splice(i,1);
+    	  i--;
+  		}
+  	  }
+  	}
   	return tops;
   };
   
+  pub.hasSearchTerm=function(node){
+    if(node.hasSearchTerm)
+      return true;
+    else if(node.children==null || node.children.length==0)
+      return false;
+    else{
+      var children = node.children;
+      for(var i=0;i<children.length;i++){
+        if(pub.hasSearchTerm(children[i]))
+          return true;
+      }
+    }
+    return false;
+  };
   
   pub.getImagefromUrl = function(url, item){
     try{

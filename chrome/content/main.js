@@ -211,16 +211,16 @@ pub.mainThread.prototype = {
         var topNodes = [];
         //if(this.words.length!=0 ||  this.optional.length!=0){
           
-          var visits = pub.history.getAllVisits(this.time);
-          topNodes = pub.history.getThreads(visits).reverse(); //need to reverse to get the latest visits on top
+          
+          topNodes = pub.history.getThreads(this.keywords, this.time).reverse(); //need to reverse to get the latest visits on top
           console.log("got tops:"+topNodes.length);
           
 		//}		
 				//refresh tree, remove all visibledata and add new ones
-        pub.treeView.delSuspensionPoints(-1);
+        //pub.treeView.delSuspensionPoints(-1);
         
         //when allPpids = null/[], show "no result with xxx", to distinguish with normal nothing found
-				if(topNodes.length==0)
+		if(topNodes.length==0)
           topNodes.push(pub.history.ReferedHistoryNode(-1, -1, pub.utils.buildFeedback(this.words, this.optional, this.excluded, this.site, this.time), null, false, false, [], 1));
         console.log(topNodes);
         pub.treeView.visibleData = topNodes;
@@ -240,16 +240,20 @@ pub.mainThread.prototype = {
     }
   };
   
+  pub.currentPeriod=pub.TODAY;
   pub.search = function(event) {
   
   	
-  	var period = pub.TODAY;
-  	if(event!=null)
+  	var period = pub.currentPeriod;
+  	if(event!=null){
   		period = event.target.getAttribute("id");
+  		pub.currentPeriod=period;
+  	}
+  	
     console.log("search with period:"+JSON.stringify(period));
     //alert(Application.storage.get("currentPage", false));
     pub.treeView.treeBox.rowCountChanged(0, -pub.treeView.visibleData.length);
-    pub.treeView.addSuspensionPoints(-1, -1);
+    //pub.treeView.addSuspensionPoints(-1, -1);
     pub.keywords = document.getElementById("keywords").value;
 		pub.query = pub.utils.getIncludeExcluded(pub.keywords);
 	pub.query.time=pub.getTime(period);

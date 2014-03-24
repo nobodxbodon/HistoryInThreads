@@ -24,7 +24,7 @@
       </menupopup>
     </menu>
   <textbox id="keywords" multiline="false" flex="1" onkeypress="com.wuxuan.fromwheretowhere.main.keypress(event)"/>
-  <button id="bsearch" label="&button.searchallwords;" disabled="true"
+  <button id="bsearch" label="&button.searchallwords;"
       oncommand="com.wuxuan.fromwheretowhere.main.search()">
   </button>
 </hbox>
