@@ -47,4 +47,5 @@
 <script src="treeview.js" />
 <script src="historyQuery.js" />
 <script src="utils.js" />
+<script src="UIutils.js" />
 </window>  

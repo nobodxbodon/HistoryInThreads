@@ -21,29 +21,9 @@ com.wuxuan.fromwheretowhere.main = function(){
   
   pub.getURLfromNode = function(treeView) {
     var sel = pub.getCurrentSelected();
-		//only when 1 selected, may switch to current tab
-		if(sel.length==1){
-			var switchToTab = document.getElementById("switchToTab");
-			var foundTab = null;
-			if(!switchToTab.fromwheretowhere || !switchToTab.fromwheretowhere.foundTab){
-				var node = pub.treeView.visibleData[pub.treeView.selection.currentIndex];
-				//check if the tab is opened already
-				foundTab = pub.UIutils.findTabByDocUrl(null, node.url);
-			}else{
-				foundTab = switchToTab.fromwheretowhere.foundTab;
-			}
-			if(foundTab.tab){
-				// The URL is already opened. Select this tab.
-				foundTab.browser.selectedTab = foundTab.tab;
-				// Focus *this* browser-window
-				foundTab.window.focus();
-			}else
-				window.open(sel[0].url);
-		}else{
-			for(var i in sel){
-				window.open(sel[i].url);
-			}
-		}
+	for(var i in sel){
+		window.open(sel[i].url);
+	}
   };
   
 	pub.DEBUG = false;
@@ -149,7 +129,7 @@ pub.mainThread.prototype = {
   
   /* to fix #2, side effect: checking menu items always */
   pub.doubleClickTreeItem = function(){
-	pub.showMenuItems();
+	//pub.showMenuItems();
 	pub.openlink();
   };
   
@@ -167,8 +147,10 @@ pub.mainThread.prototype = {
     var selected = [];
     for(var i in selectedIndex){
       var node = pub.treeView.visibleData[selectedIndex[i]];
+      //MUST: when double click a tree item, default is to toggle open state. now open link, so need to toggle it again...bad solution but works
+      pub.treeView.toggleOpenState(selectedIndex[i]);
       //clean away id/pid from the node, as it's useless for other instances of FF
-      selected.push(pub.history.clearReferedHistoryNode(pub.utils.cloneObject(node)));
+      selected.push(pub.utils.cloneObject(node));
     }
     return selected;
   };
@@ -318,13 +300,13 @@ pub.mainThread.prototype = {
         .getInterface(Components.interfaces.nsIDOMWindow);
  
   pub.init = function() {
-          console.log("main init");
       
     pub.aserv=Components.classes["@mozilla.org/atom-service;1"].
                 getService(Components.interfaces.nsIAtomService);
     pub.main = Components.classes["@mozilla.org/thread-manager;1"].getService().mainThread;
 	pub.utils = com.wuxuan.fromwheretowhere.utils;
 	pub.history = com.wuxuan.fromwheretowhere.historyQuery;
+	pub.UIutils = com.wuxuan.fromwheretowhere.UIutils;
   }
   
   return pub;
