@@ -202,11 +202,10 @@ pub.mainThread.prototype = {
         //pub.treeView.delSuspensionPoints(-1);
         
         //when allPpids = null/[], show "no result with xxx", to distinguish with normal nothing found
-		if(topNodes.length==0)
-          topNodes.push(pub.history.ReferedHistoryNode(-1, -1, pub.utils.buildFeedback(this.words, this.optional, this.excluded, this.site, this.time), null, false, false, [], 1));
+		
         console.log(topNodes);
         pub.treeView.visibleData = topNodes;
-        pub.treeView.treeBox.rowCountChanged(0, pub.treeView.visibleData.length);
+        pub.treeView.treeBox.rowCountChanged(0, topNodes.length);
         console.log("done refresh tree");
       } catch(err) {
         Components.utils.reportError(err);
