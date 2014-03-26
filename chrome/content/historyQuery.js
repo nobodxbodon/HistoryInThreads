@@ -4,6 +4,23 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 
   var pub={};
   
+  
+  pub.DAYTIME=(24*60*60*1000000);
+  
+  pub.TODAY = 'today';
+  pub.YESTERDAY = 'yesterday';
+  pub.LAST7DAYS = 'last7days';
+  pub.THISMONTH = 'thismonth';
+  pub.THISYEAR = 'thisyear';
+  pub.ALL = 'all';
+  
+  pub.lastPeriod = pub.TODAY;
+  //save all the periods that got mapped icon
+  pub.currentPeriod=[];
+  
+  
+  pub.mapIcon = {};
+	
   //sqlite operations:
 
   pub.openPlacesDatabase = function(){
@@ -22,9 +39,9 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   pub.histServ =
   	Components.classes["@mozilla.org/browser/nav-history-service;1"].
   	getService(Components.interfaces.nsINavHistoryService);
-
-  pub.getAllVisits = function(searchterm, time){
-  	console.log("get visits by words:"+searchterm);
+  
+  pub.updateVisitIcons = function(time){
+    console.log("updateVisitIcons:"+time);
   	var opts = pub.histServ.getNewQueryOptions();
 	var query = pub.histServ.getNewQuery();
 	query.absoluteBeginTime = time.since;
@@ -36,7 +53,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 	// see : https://developer.mozilla.org/en/nsINavHistoryContainerResultNode
 	var cont = result.root;
     cont.containerOpen = true;
-	var mapIcon = {};
 	for (var i = 0; i < cont.childCount; i ++) {
 
     	var node = cont.getChild(i);
@@ -44,8 +60,42 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
     	// "node" attributes contains the information (e.g. URI, title, time, icon...)
    		// see : https://developer.mozilla.org/en/nsINavHistoryResultNode
     	//console.log(node.icon+" "+node.uri+" "+node.title);
-		mapIcon[node.uri]=node.icon;
+		pub.mapIcon[node.uri]=node.icon;
 	}
+  }
+  
+  pub.includePeriod = function(small, large){
+    console.log("check include:"+small+"<"+large);
+    if(small==large)
+      return true;
+    else if(small==pub.TODAY && (large==pub.LAST7DAYS || large==pub.THISMONTH || large==pub.THISYEAR || large==pub.ALL))
+      return true;
+    else if(small==pub.YESTERDAY && (large==pub.LAST7DAYS || large==pub.ALL))
+      return true;
+    else if((small==pub.LAST7DAYS || small==pub.THISMONTH || small==pub.THISYEAR) && large==pub.ALL)
+      return true;
+    else if(small==pub.THISMONTH && large==pub.THISYEAR)
+      return true;
+    else
+      return false;
+  };
+  
+  pub.getAllVisits = function(searchterm, period){
+    var time=pub.getTime(period);
+	var fUpdateIcon = pub.needUpdateIcon(period);
+  	console.log("get visits by words:"+searchterm+" during:"+time);
+  	var i=0;
+  	for(;i<pub.currentPeriod.length;i++){
+  	  if(pub.includePeriod(period,pub.currentPeriod[i])){
+  	    break;
+  	  }
+  	}
+  	if(i==pub.currentPeriod.length){
+  	  pub.updateVisitIcons(time);
+  	  pub.currentPeriod.push(period);
+  	}
+  	
+  	var opts = pub.histServ.getNewQueryOptions();
 	
 	var mapTerm = {};
 	//get nodes with searchterm
@@ -91,7 +141,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 		visit.visit_date=statement.getInt64(3);
 		visit.visit_type=statement.getInt32(4);
 		visit.url=statement.getString(5);
-		visit.icon=mapIcon[visit.url];
+		visit.icon=pub.mapIcon[visit.url];
 		visit.hasSearchTerm=mapTerm[visit.visit_date];
 		visit.label=statement.getString(6);
 		//console.log(JSON.stringify(visit));
@@ -117,6 +167,44 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	}
   	return term;
   };
+  
+  
+  pub.getTime = function(period) {
+  	console.log("start getTime:"+period);
+    var p = {since: -1, till: Number.MAX_VALUE};
+  	if(period==pub.TODAY){
+  	  p.since=pub.getTodayStartTime();
+  	}else if(period==pub.YESTERDAY){
+  	  p.till=pub.getTodayStartTime();
+  	  p.since=p.till-pub.DAYTIME;
+  	}else if(period==pub.LAST7DAYS){
+  	  p.since=pub.getTodayStartTime()-pub.DAYTIME*7;
+  	}else if(period==pub.THISMONTH){
+  	  var date = new Date();
+  	  var year = date.getFullYear();
+  	  var month = date.getMonth();
+  	  p.since=new Date(year,month,1)*1000;
+  	}else if(period==pub.THISYEAR){
+  	  var year = new Date().getFullYear();
+  	  p.since=new Date(year,0,1)*1000;
+  	}
+  	//update the period
+  	pub.lastPeriod = period;
+  	return p;
+  };
+  
+  pub.needUpdateIcon = function(period) {
+  
+  }
+  pub.getTodayStartTime = function() {
+  	var now=new Date();
+  	var hour = now.getHours();
+	var milli = now.getMilliseconds();
+    var min = now.getMinutes();
+    var sec = now.getSeconds();
+    return (now-((60*hour+min)*60+sec)*1000+milli)*1000;
+  };
+  
   
   /* for latest visits ordered by latest first, walk them from the earliest, add it to the node based on from_visit, order by visit time*/
   pub.getThreads = function(searchterm, time){
@@ -161,7 +249,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	if(searchterm!=""){
   	  for(var i=0;i<tops.length;i++){
   	    if(!pub.hasSearchTerm(tops[i])){
-  	      console.log("remove:"+tops[i].label);
+  	      //console.log("remove:"+tops[i].label);
     	  tops.splice(i,1);
     	  i--;
   		}

@@ -4,13 +4,6 @@ com.wuxuan.fromwheretowhere.main = function(){
 
 	// Get a reference to the strings bundle
   //pub.stringsBundle = document.getElementById("fromwheretowhere.string-bundle");
-  pub.DAYTIME=(24*60*60*1000000);
-  pub.TODAY = 'today';
-  pub.YESTERDAY = 'yesterday';
-  pub.LAST7DAYS = 'last7days';
-  pub.THISMONTH = 'thismonth';
-  pub.THISYEAR = 'thisyear';
-  pub.ALL = 'all';
   
   pub.getCurrentURI = function() {
     if(!window.opener){
@@ -181,7 +174,8 @@ pub.mainThread.prototype = {
 		this.optional = query.optional;
     this.excluded = query.excluded;
 		this.site = query.site;
-		this.time = query.time;
+		this.period = query.period;
+		this.fUpdateIcon = query.fUpdateIcon;
 		this.query = query;
   };
   
@@ -194,7 +188,7 @@ pub.mainThread.prototype = {
         //if(this.words.length!=0 ||  this.optional.length!=0){
           
           
-          topNodes = pub.history.getThreads(this.keywords, this.time).reverse(); //need to reverse to get the latest visits on top
+          topNodes = pub.history.getThreads(this.keywords, this.period).reverse(); //need to reverse to get the latest visits on top
           console.log("got tops:"+topNodes.length);
           
 		//}		
@@ -221,14 +215,12 @@ pub.mainThread.prototype = {
     }
   };
   
-  pub.currentPeriod=pub.TODAY;
   pub.search = function(event) {
   
   	
-  	var period = pub.currentPeriod;
+  	var period = pub.history.lastPeriod;
   	if(event!=null){
   		period = event.target.getAttribute("id");
-  		pub.currentPeriod=period;
   	}
   	
     console.log("search with period:"+JSON.stringify(period));
@@ -237,44 +229,11 @@ pub.mainThread.prototype = {
     //pub.treeView.addSuspensionPoints(-1, -1);
     pub.keywords = document.getElementById("keywords").value;
 		pub.query = pub.utils.getIncludeExcluded(pub.keywords);
-	pub.query.time=pub.getTime(period);
-	console.log(pub.query.time);
+	pub.query.period = period;
     pub.main.dispatch(new pub.searchThread(1, pub.query), pub.main.DISPATCH_NORMAL);
     Application.storage.set("currentURI", "");
   };
 
-  pub.getTime = function(period) {
-  	console.log("start getTime:"+period);
-    var p = {since: -1, till: Number.MAX_VALUE};
-  	if(period==pub.TODAY){
-  	  p.since=pub.getTodayStartTime();
-  	}else if(period==pub.YESTERDAY){
-  	  p.till=pub.getTodayStartTime();
-  	  p.since=p.till-pub.DAYTIME;
-  	}else if(period==pub.LAST7DAYS){
-  	  p.since=pub.getTodayStartTime()-pub.DAYTIME*7;
-  	}else if(period==pub.THISMONTH){
-  	  var date = new Date();
-  	  var year = date.getFullYear();
-  	  var month = date.getMonth();
-  	  p.since=new Date(year,month,1)*1000;
-  	}else if(period==pub.THISYEAR){
-  	  var year = new Date().getFullYear();
-  	  p.since=new Date(year,0,1)*1000;
-  	}
-  	console.log("in getTime:"+p);
-  	return p;
-  };
-  
-  pub.getTodayStartTime = function() {
-  	var now=new Date();
-  	var hour = now.getHours();
-	var milli = now.getMilliseconds();
-    var min = now.getMinutes();
-    var sec = now.getSeconds();
-    return (now-((60*hour+min)*60+sec)*1000+milli)*1000;
-  };
-  
 	pub.findNext = function(){
 		//pub.treeView.toggleOpenState(0);
 		pub.treeView.findNext();
