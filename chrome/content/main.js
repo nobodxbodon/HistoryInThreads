@@ -188,7 +188,10 @@ pub.mainThread.prototype = {
         //if(this.words.length!=0 ||  this.optional.length!=0){
           
           
-          topNodes = pub.history.getThreads(this.keywords, this.period).reverse(); //need to reverse to get the latest visits on top
+          topNodes = pub.history.getThreads(this.keywords, this.period); //need to reverse to get the latest visits on top
+          //alert(topNodes.length);
+          topNodes.reverse();
+          //alert("after reverse, got tops:"+topNodes.length);
           console.log("got tops:"+topNodes.length);
           
 		//}		
@@ -197,7 +200,6 @@ pub.mainThread.prototype = {
         
         //when allPpids = null/[], show "no result with xxx", to distinguish with normal nothing found
 		
-        console.log(topNodes);
         pub.treeView.visibleData = topNodes;
         pub.treeView.treeBox.rowCountChanged(0, topNodes.length);
         console.log("done refresh tree");
@@ -218,7 +220,7 @@ pub.mainThread.prototype = {
   pub.search = function(event) {
   
   	
-  	var period = pub.history.lastPeriod;
+  	var period = pub.history.lastPeriod==null?pub.history.TODAY:pub.history.lastPeriod;
   	if(event!=null){
   		period = event.target.getAttribute("id");
   	}

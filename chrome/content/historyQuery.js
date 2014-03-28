@@ -14,13 +14,19 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   pub.THISYEAR = 'thisyear';
   pub.ALL = 'all';
   
-  pub.lastPeriod = pub.TODAY;
+  pub.lastPeriod = null;
   //save all the periods that got mapped icon
   pub.currentPeriod=[];
+  pub.lastSearchterm = null;
   
-  
+  //map: uri -> icon
   pub.mapIcon = {};
-	
+  //map: visit_date -> if this visit has specified search term
+  pub.mapTerm = {};
+  //no need to update pub.tops if pub.visits stay the same, maybe no need for pub.visits
+  pub.visits = [];
+  pub.tops = [];
+  
   //sqlite operations:
 
   pub.openPlacesDatabase = function(){
@@ -41,6 +47,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	getService(Components.interfaces.nsINavHistoryService);
   
   pub.updateVisitIcons = function(time){
+    pub.mapIcon={};
     console.log("updateVisitIcons:"+time);
   	var opts = pub.histServ.getNewQueryOptions();
 	var query = pub.histServ.getNewQuery();
@@ -62,7 +69,112 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
     	//console.log(node.icon+" "+node.uri+" "+node.title);
 		pub.mapIcon[node.uri]=node.icon;
 	}
+	
+    // Close container when done
+    cont.containerOpen = false;
   }
+  
+  pub.updateSearchResult = function(searchterm, time){
+    pub.mapTerm = {};
+  	var opts = pub.histServ.getNewQueryOptions();
+	
+	//get nodes with searchterm
+    if(searchterm!=""){
+    var query2 = pub.histServ.getNewQuery();
+	query2.absoluteBeginTime = time.since;
+	query2.absoluteEndTime = time.till;
+    query2.searchTerms=searchterm;
+    var withTerm = pub.histServ.executeQuery(query2, opts);
+    
+	//get those with term
+	cont = withTerm.root;
+    cont.containerOpen = true;
+	for (var i = 0; i < cont.childCount; i ++) {
+
+    	var node = cont.getChild(i);
+    	//console.log(node.icon+" "+node.uri+" "+node.title);
+		pub.mapTerm[node.time]=true;
+	}
+	
+    // Close container when done
+    cont.containerOpen = false;
+    }
+  };
+  
+  pub.updateVisitsInRange = function(time){
+  
+  	pub.visits = [];
+  	var range = pub.buildPeriodTerm(time, 'hv.visit_date');
+  	if(range!="")
+  		range=" where "+range;
+  	var term = "SELECT hv.id, hv.from_visit, hv.place_id, hv.visit_date, hv.visit_type, p.url, p.title FROM moz_historyvisits hv join moz_places p on hv.place_id=p.id" + range + " order by hv.visit_date desc";
+  	console.log("search term:"+term);
+  	var statement = pub.mDBConn.createStatement(term);
+    try {
+      while (statement.executeStep()) {
+		var visit={};
+		visit.id=statement.getInt32(0);
+		visit.from_visit=statement.getInt32(1);
+		visit.placeId=statement.getInt32(2);
+		visit.visit_date=statement.getInt64(3);
+		visit.visit_type=statement.getInt32(4);
+		visit.url=statement.getString(5);
+		visit.label=statement.getString(6);
+		//console.log(JSON.stringify(visit));
+		pub.visits.push(visit);
+      }
+      statement.reset();
+      console.log("visit num:"+pub.visits.length);
+    } 
+    catch (e) {
+      console.log("error in getAllvisits:"+JSON.stringify(e));
+      statement.reset();
+    }
+    
+    //update tree, return top nodes
+    var mapId = {};
+	pub.tops = [];
+	var visit = null;
+	var visitAfter = null;
+	console.log("getThreads visits length:"+pub.visits.length);
+  	for(var i=pub.visits.length-1;i>=0;i--){
+  	  visit = pub.visits[i];
+  	  
+  	  //TODO: just need to assign to those with searchterm
+  	  visit.icon=pub.mapIcon[visit.url];
+  	  
+  	  //check if the visit after is redirect: 5- perm redirect; 6- temp
+  	  // skip them
+  	  if(i>=1){
+  	  	visitAfter = pub.visits[i-1];
+  	  	if(visitAfter.visit_type==5 || visitAfter.visit_type==6){
+  	  	//i--,visitAfter = visits[i-1])
+  	  		//console.log(visitAfter.id+"<-"+visitAfter.from_visit+" to "+visitAfter.id+"<-"+visit.from_visit);
+  	  		visitAfter.from_visit=visit.from_visit;
+  	  		continue;
+  	  	}
+  	  }
+  	  
+  	  //if follow a link, visit_type=1
+  	  var fromVisit = mapId[visit.from_visit];
+  	  //console.log("fromVisit:"+fromVisit);
+  	  if(fromVisit!=null){
+  	    visit.level=fromVisit.level+1;
+  	    fromVisit.isContainer=true;
+  	  	if(fromVisit.children==null)
+  	  	  fromVisit.children=[];
+  	    fromVisit.children.push(visit);
+  	  }//otherwise 2 - type/autocomplate; 3 - click on bookmark; 4 - embedded url
+  	  else{
+  	  	//console.log(visit);
+  	    visit.level=0;
+  	    pub.tops.push(visit);
+  	  }
+  	  //add to visit_id
+  	  mapId[visit.id]=visit;
+  	}
+  	console.log("after constructing trees:"+pub.tops.length);
+  };
   
   pub.includePeriod = function(small, large){
     console.log("check include:"+small+"<"+large);
@@ -80,6 +192,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
       return false;
   };
   
+  
   pub.getAllVisits = function(searchterm, period){
     var time=pub.getTime(period);
 	var fUpdateIcon = pub.needUpdateIcon(period);
@@ -90,71 +203,30 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	    break;
   	  }
   	}
+  	//console.log(searchterm+"?="+pub.lastSearchterm);
+  	// when search term differs from last OR period changes, update items that have search terms 
+  	if(searchterm!=pub.lastSearchterm || i==pub.currentPeriod.length){
+  	  pub.updateSearchResult(searchterm, time);
+  	  pub.lastSearchterm=searchterm;
+  	}
+  	  
   	if(i==pub.currentPeriod.length){
+  	  
   	  pub.updateVisitIcons(time);
   	  pub.currentPeriod.push(period);
+  	  
   	}
   	
-  	var opts = pub.histServ.getNewQueryOptions();
-	
-	var mapTerm = {};
-	//get nodes with searchterm
-    if(searchterm!=""){
-    var query2 = pub.histServ.getNewQuery();
-	query2.absoluteBeginTime = time.since;
-	query2.absoluteEndTime = time.till;
-    query2.searchTerms=searchterm;
-    var withTerm = pub.histServ.executeQuery(query2, opts);
-    
-	//get those with term
-	cont = withTerm.root;
-    cont.containerOpen = true;
-	for (var i = 0; i < cont.childCount; i ++) {
-
-    	var node = cont.getChild(i);
-	
-    	// "node" attributes contains the information (e.g. URI, title, time, icon...)
-   		// see : https://developer.mozilla.org/en/nsINavHistoryResultNode
-    	//console.log(node.icon+" "+node.uri+" "+node.title);
-		mapTerm[node.time]=true;
-	}
-	
-    // Close container when done
-    // see : https://developer.mozilla.org/en/nsINavHistoryContainerResultNode
-    cont.containerOpen = false;
-    }
-    
-    console.log("in getAllVisits, time:"+JSON.stringify(time));
-  	var visits = [];
-  	var range = pub.buildPeriodTerm(time, 'hv.visit_date');
-  	if(range!="")
-  		range=" where "+range;
-  	var term = "SELECT hv.id, hv.from_visit, hv.place_id, hv.visit_date, hv.visit_type, p.url, p.title FROM moz_historyvisits hv join moz_places p on hv.place_id=p.id" + range + " order by hv.visit_date desc";
-  	console.log("search term:"+term);
-  	var statement = pub.mDBConn.createStatement(term);
-    try {
-      while (statement.executeStep()) {
-		var visit={};
-		visit.id=statement.getInt32(0);
-		visit.from_visit=statement.getInt32(1);
-		visit.placeId=statement.getInt32(2);
-		visit.visit_date=statement.getInt64(3);
-		visit.visit_type=statement.getInt32(4);
-		visit.url=statement.getString(5);
-		visit.icon=pub.mapIcon[visit.url];
-		visit.hasSearchTerm=mapTerm[visit.visit_date];
-		visit.label=statement.getString(6);
-		//console.log(JSON.stringify(visit));
-		visits.push(visit);
-      }
-      statement.reset();
-      console.log("visit num:"+visits.length);
-      return visits;  
-    } 
-    catch (e) {
-      console.log("error in getAllvisits:"+JSON.stringify(e));
-      statement.reset();
-    }
+    console.log("in getAllVisits, time:"+JSON.stringify(time)+" "+period+" "+pub.lastPeriod);
+    //don't update visits unless period changes
+    if(period==pub.lastPeriod)
+      return;
+  	else {
+  	  //update the period
+  	  pub.lastPeriod = period;
+  	  pub.updateVisitsInRange(time);
+  	}
+  	
   };
   
   pub.buildPeriodTerm = function(time, field){
@@ -188,8 +260,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  var year = new Date().getFullYear();
   	  p.since=new Date(year,0,1)*1000;
   	}
-  	//update the period
-  	pub.lastPeriod = period;
   	return p;
   };
   
@@ -208,58 +278,26 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   
   /* for latest visits ordered by latest first, walk them from the earliest, add it to the node based on from_visit, order by visit time*/
   pub.getThreads = function(searchterm, time){
-    var visits = pub.getAllVisits(searchterm, time);
-	var mapId = {};
+    pub.getAllVisits(searchterm, time);
 	var tops = [];
-	var visit = null;
-	var visitAfter = null;
-  	for(var i=visits.length-1;i>=0;i--){
-  	  visit = visits[i];
-  	  //check if the visit after is redirect: 5- perm redirect; 6- temp
-  	  // skip them
-  	  if(i>=1){
-  	  	visitAfter = visits[i-1];
-  	  	if(visitAfter.visit_type==5 || visitAfter.visit_type==6){
-  	  	//i--,visitAfter = visits[i-1])
-  	  		//console.log(visitAfter.id+"<-"+visitAfter.from_visit+" to "+visitAfter.id+"<-"+visit.from_visit);
-  	  		visitAfter.from_visit=visit.from_visit;
-  	  		continue;
-  	  	}
-  	  }
-  	  
-  	  //if follow a link, visit_type=1
-  	  var fromVisit = mapId[visit.from_visit];
-  	  //console.log("fromVisit:"+fromVisit);
-  	  if(fromVisit!=null){
-  	    visit.level=fromVisit.level+1;
-  	    fromVisit.isContainer=true;
-  	  	if(fromVisit.children==null)
-  	  	  fromVisit.children=[];
-  	    fromVisit.children.push(visit);
-  	  }//otherwise 2 - type/autocomplate; 3 - click on bookmark; 4 - embedded url
-  	  else{
-  	  	//console.log(visit);
-  	    visit.level=0;
-  	    tops.push(visit);
-  	  }
-  	  //add to visit_id
-  	  mapId[visit.id]=visit;
-  	}
   	//TODO: remove those without keywords (marked by flag)
   	if(searchterm!=""){
-  	  for(var i=0;i<tops.length;i++){
-  	    if(!pub.hasSearchTerm(tops[i])){
+  	  for(var i=0;i<pub.tops.length;i++){
+  	    if(pub.hasSearchTerm(pub.tops[i])){
   	      //console.log("remove:"+tops[i].label);
-    	  tops.splice(i,1);
-    	  i--;
+    	  tops.push(pub.tops[i]);
   		}
   	  }
+  	}else{
+  	  tops=pub.tops;
   	}
+  	//alert("after filter by search term");
   	return tops;
   };
   
   pub.hasSearchTerm=function(node){
-    if(node.hasSearchTerm)
+	var hasSearchTerm=pub.mapTerm[node.visit_date];
+    if(hasSearchTerm)
       return true;
     else if(node.children==null || node.children.length==0)
       return false;
