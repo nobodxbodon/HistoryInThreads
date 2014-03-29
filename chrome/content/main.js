@@ -192,7 +192,7 @@ pub.mainThread.prototype = {
           //alert(topNodes.length);
           topNodes.reverse();
           //alert("after reverse, got tops:"+topNodes.length);
-          console.log("got tops:"+topNodes.length);
+          //console.log("got tops:"+topNodes.length);
           
 		//}		
 				//refresh tree, remove all visibledata and add new ones
@@ -202,7 +202,7 @@ pub.mainThread.prototype = {
 		
         pub.treeView.visibleData = topNodes;
         pub.treeView.treeBox.rowCountChanged(0, topNodes.length);
-        console.log("done refresh tree");
+        //console.log("done refresh tree");
       } catch(err) {
         Components.utils.reportError(err);
       }
@@ -225,7 +225,7 @@ pub.mainThread.prototype = {
   		period = event.target.getAttribute("id");
   	}
   	
-    console.log("search with period:"+JSON.stringify(period));
+    //console.log("search with period:"+JSON.stringify(period));
     //alert(Application.storage.get("currentPage", false));
     pub.treeView.treeBox.rowCountChanged(0, -pub.treeView.visibleData.length);
     //pub.treeView.addSuspensionPoints(-1, -1);

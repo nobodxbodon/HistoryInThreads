@@ -27,6 +27,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   pub.visits = [];
   pub.tops = [];
   
+  pub.expanded = [];
   //sqlite operations:
 
   pub.openPlacesDatabase = function(){
@@ -48,7 +49,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   
   pub.updateVisitIcons = function(time){
     pub.mapIcon={};
-    console.log("updateVisitIcons:"+time);
+    //console.log("updateVisitIcons:"+time);
   	var opts = pub.histServ.getNewQueryOptions();
 	var query = pub.histServ.getNewQuery();
 	query.absoluteBeginTime = time.since;
@@ -108,7 +109,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	if(range!="")
   		range=" where "+range;
   	var term = "SELECT hv.id, hv.from_visit, hv.place_id, hv.visit_date, hv.visit_type, p.url, p.title FROM moz_historyvisits hv join moz_places p on hv.place_id=p.id" + range + " order by hv.visit_date desc";
-  	console.log("search term:"+term);
+  	//console.log("search term:"+term);
   	var statement = pub.mDBConn.createStatement(term);
     try {
       while (statement.executeStep()) {
@@ -124,7 +125,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 		pub.visits.push(visit);
       }
       statement.reset();
-      console.log("visit num:"+pub.visits.length);
+      //console.log("visit num:"+pub.visits.length);
     } 
     catch (e) {
       console.log("error in getAllvisits:"+JSON.stringify(e));
@@ -136,7 +137,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 	pub.tops = [];
 	var visit = null;
 	var visitAfter = null;
-	console.log("getThreads visits length:"+pub.visits.length);
+	//console.log("getThreads visits length:"+pub.visits.length);
   	for(var i=pub.visits.length-1;i>=0;i--){
   	  visit = pub.visits[i];
   	  
@@ -173,11 +174,11 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  //add to visit_id
   	  mapId[visit.id]=visit;
   	}
-  	console.log("after constructing trees:"+pub.tops.length);
+  	//console.log("after constructing trees:"+pub.tops.length);
   };
   
   pub.includePeriod = function(small, large){
-    console.log("check include:"+small+"<"+large);
+    //console.log("check include:"+small+"<"+large);
     if(small==large)
       return true;
     else if(small==pub.TODAY && (large==pub.LAST7DAYS || large==pub.THISMONTH || large==pub.THISYEAR || large==pub.ALL))
@@ -196,7 +197,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   pub.getAllVisits = function(searchterm, period){
     var time=pub.getTime(period);
 	var fUpdateIcon = pub.needUpdateIcon(period);
-  	console.log("get visits by words:"+searchterm+" during:"+time);
+  	//console.log("get visits by words:"+searchterm+" during:"+time);
   	var i=0;
   	for(;i<pub.currentPeriod.length;i++){
   	  if(pub.includePeriod(period,pub.currentPeriod[i])){
@@ -217,7 +218,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  
   	}
   	
-    console.log("in getAllVisits, time:"+JSON.stringify(time)+" "+period+" "+pub.lastPeriod);
+    //console.log("in getAllVisits, time:"+JSON.stringify(time)+" "+period+" "+pub.lastPeriod);
     //don't update visits unless period changes
     if(period==pub.lastPeriod)
       return;
@@ -242,7 +243,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   
   
   pub.getTime = function(period) {
-  	console.log("start getTime:"+period);
+  	//console.log("start getTime:"+period);
     var p = {since: -1, till: Number.MAX_VALUE};
   	if(period==pub.TODAY){
   	  p.since=pub.getTodayStartTime();
@@ -279,6 +280,12 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   /* for latest visits ordered by latest first, walk them from the earliest, add it to the node based on from_visit, order by visit time*/
   pub.getThreads = function(searchterm, time){
     pub.getAllVisits(searchterm, time);
+    //console.log("fold nodes:"+pub.expanded.length);
+    for(var i=0;i<pub.expanded.length;i++){
+      //console.log("fold:"+pub.expanded[i].label);
+      pub.expanded[i].isFolded=false;
+    }
+    pub.expanded=[];
 	var tops = [];
   	//TODO: remove those without keywords (marked by flag)
   	if(searchterm!=""){
@@ -289,7 +296,9 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   		}
   	  }
   	}else{
-  	  tops=pub.tops;
+  	  for(var i=0;i<pub.tops.length;i++){
+  	  	tops.push(pub.tops[i]);
+  	  }
   	}
   	//alert("after filter by search term");
   	return tops;

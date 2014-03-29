@@ -189,6 +189,8 @@ com.wuxuan.fromwheretowhere.mainView = function(){
       }
     }  
     else {
+      //add expanded item to history
+      main.history.expanded.push(item);
       //FIX: Warning: reference to undefined property main.main.query
       if(main.query)
         main.main.dispatch(new main.mainThread(1, item, idx, main.query, findNext), main.main.DISPATCH_NORMAL);
@@ -247,7 +249,7 @@ com.wuxuan.fromwheretowhere.mainView = function(){
 }};
 	
   pub.init = function(main){
-    console.log("treeview init");
+    //console.log("treeview init");
     main.init();
     // Main Tree definition
     pub.utils = com.wuxuan.fromwheretowhere.utils;
