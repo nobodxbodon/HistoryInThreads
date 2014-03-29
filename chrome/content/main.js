@@ -222,7 +222,7 @@ pub.mainThread.prototype = {
   	
   	var period = pub.history.lastPeriod==null?pub.history.TODAY:pub.history.lastPeriod;
   	if(event!=null){
-  		period = event.target.getAttribute("id");
+  	  period = event.target.getAttribute("id");
   	}
   	
     //console.log("search with period:"+JSON.stringify(period));

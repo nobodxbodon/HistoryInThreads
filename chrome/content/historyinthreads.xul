@@ -7,7 +7,7 @@
         xmlns:html="http://www.w3.org/1999/xhtml">  
 
 <hbox>
-  <menu id="period_menu" label="Time">
+    <menulist id="period_menu">
       <menupopup>
         <menuitem id="today" label="Today" type="radio" checked="true"
         	oncommand="com.wuxuan.fromwheretowhere.main.search(event)"/>
@@ -22,11 +22,8 @@
         <menuitem id="all" label="All" type="radio"
         	oncommand="com.wuxuan.fromwheretowhere.main.search(event)"/>
       </menupopup>
-    </menu>
-  <textbox id="keywords" multiline="false" flex="1" onkeypress="com.wuxuan.fromwheretowhere.main.keypress(event)"/>
-  <button id="bsearch" label="&button.searchallwords;"
-      oncommand="com.wuxuan.fromwheretowhere.main.search()">
-  </button>
+    </menulist>
+  <textbox id="keywords" type="search" searchbutton="true" placeholder="Search" multiline="false" flex="1" onkeypress="com.wuxuan.fromwheretowhere.main.keypress(event)"/>
 </hbox>
 
 <tree id="elementList" flex="1">  
@@ -37,7 +34,7 @@
     <treecol id="url" label="&table.url;" hidden="true" flex="3"/>
       <splitter resizeafter="closest">
       </splitter>
-     <treecol id="date" label="&table.date;" flex="1"/>
+     <treecol id="date" label="&table.date;" hidden="true" flex="1"/>
   </treecols>
   <treechildren context="clipmenu" ondblclick="com.wuxuan.fromwheretowhere.main.doubleClickTreeItem()"/>  
 </tree>  
