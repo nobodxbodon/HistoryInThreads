@@ -216,7 +216,10 @@ pub.mainThread.prototype = {
 		//pub.treeView.toggleOpenState(0);
 		pub.treeView.findNext();
 	};
-	
+  
+  pub.deleteSelected = function(event){
+    console.log("TODO: delete");
+  };
   pub.keypress = function(event) {
     if(!event){
       alert("no event!");
