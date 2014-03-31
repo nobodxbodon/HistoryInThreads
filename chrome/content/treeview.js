@@ -196,7 +196,6 @@ com.wuxuan.fromwheretowhere.mainView = function(){
         main.main.dispatch(new main.mainThread(1, item, idx, main.query, findNext), main.main.DISPATCH_NORMAL);
       else
         main.main.dispatch(new main.mainThread(1, item, idx, null, findNext), main.main.DISPATCH_NORMAL);
-      this.addSuspensionPoints(item.level, idx);
       
     }  
     this.treeBox.invalidateRow(idx);

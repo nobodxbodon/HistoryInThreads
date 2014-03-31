@@ -43,30 +43,8 @@ pub.mainThread.prototype = {
 			if(pub.isNewSession(this.item))
 				pub.alreadyExpandedPids = [];
 			pub.alreadyExpandedPids.push(this.item.placeId);
-      //CAN'T alert here!! will crash!
-      /*if(this.item.isContainer){
-				//if there are children already, means local notes
-				if(this.item.children.length==0){
-					var onTopic = false;
-					if(this.item.notRelated){
-						//thought not related, but user is interested. learn from this record
-						pub.topicTracker.learnFromCase(this.item);
-						this.item.notRelated=false;
-					}
-					if(pub.topicTracker)
-						onTopic = pub.topicTracker.followContent(this.item.label, pub.isNewSession(this.item));
-					//TODO: if still !onTopic, need to re-learn
-					//the start of a session, always expand
-					this.item = pub.allChildrenfromPid(this.item, this.query);
-				} else {
-					//TODO: make sure after this, the title will be guarantee "onTopic"
-					// walk through the already existed children list, and mark "noNeedExpand"
-					this.item = pub.checkIfExpand(this.item, true);
-				}
-      }*/
-      //alert(pub.timestats1);
+      
       // This is where we react to the completion of the working thread.
-      pub.treeView.delSuspensionPoints(this.idx);
       pub.treeView.expandFromNodeInTree(this.item, this.idx);
 			if(this.findNext){
 				//alert("find Next");
@@ -121,8 +99,7 @@ pub.mainThread.prototype = {
   };
   
   /* to fix #2, side effect: checking menu items always */
-  pub.doubleClickTreeItem = function(){
-	//pub.showMenuItems();
+  pub.doubleClickTreeItem = function(event){
 	pub.openlink();
   };
   
@@ -140,8 +117,7 @@ pub.mainThread.prototype = {
     var selected = [];
     for(var i in selectedIndex){
       var node = pub.treeView.visibleData[selectedIndex[i]];
-      //MUST: when double click a tree item, default is to toggle open state. now open link, so need to toggle it again...bad solution but works
-      pub.treeView.toggleOpenState(selectedIndex[i]);
+      
       //clean away id/pid from the node, as it's useless for other instances of FF
       selected.push(pub.utils.cloneObject(node));
     }

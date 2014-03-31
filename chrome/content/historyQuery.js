@@ -23,8 +23,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   pub.mapIcon = {};
   //map: visit_date -> if this visit has specified search term
   pub.mapTerm = {};
-  //no need to update pub.tops if pub.visits stay the same, maybe no need for pub.visits
-  pub.visits = [];
+  
   pub.tops = [];
   
   pub.expanded = [];
@@ -104,7 +103,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   
   pub.updateVisitsInRange = function(time){
   
-  	pub.visits = [];
+  	var visits = [];
   	var range = pub.buildPeriodTerm(time, 'hv.visit_date');
   	if(range!="")
   		range=" where "+range;
@@ -122,10 +121,10 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 		visit.url=statement.getString(5);
 		visit.label=statement.getString(6);
 		//console.log(JSON.stringify(visit));
-		pub.visits.push(visit);
+		visits.push(visit);
       }
       statement.reset();
-      //console.log("visit num:"+pub.visits.length);
+      //console.log("visit num:"+visits.length);
     } 
     catch (e) {
       console.log("error in getAllvisits:"+JSON.stringify(e));
@@ -137,9 +136,9 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 	pub.tops = [];
 	var visit = null;
 	var visitAfter = null;
-	//console.log("getThreads visits length:"+pub.visits.length);
-  	for(var i=pub.visits.length-1;i>=0;i--){
-  	  visit = pub.visits[i];
+	//console.log("getThreads visits length:"+visits.length);
+  	for(var i=visits.length-1;i>=0;i--){
+  	  visit = visits[i];
   	  
   	  //TODO: just need to assign to those with searchterm
   	  visit.icon=pub.mapIcon[visit.url];
@@ -147,7 +146,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  //check if the visit after is redirect: 5- perm redirect; 6- temp
   	  // skip them
   	  if(i>=1){
-  	  	visitAfter = pub.visits[i-1];
+  	  	visitAfter = visits[i-1];
   	  	if(visitAfter.visit_type==5 || visitAfter.visit_type==6){
   	  	//i--,visitAfter = visits[i-1])
   	  		//console.log(visitAfter.id+"<-"+visitAfter.from_visit+" to "+visitAfter.id+"<-"+visit.from_visit);
