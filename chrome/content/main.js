@@ -112,7 +112,7 @@ pub.mainThread.prototype = {
     var selectedIndex = pub.UIutils.getAllSelectedIndex(pub.treeView);
     //verify 
     if(selectCount!=selectedIndex.length){
-      alert("Error when getting selected rows");
+      console.log("Error when getting selected rows");
     }
     var selected = [];
     for(var i in selectedIndex){
@@ -120,6 +120,22 @@ pub.mainThread.prototype = {
       
       //clean away id/pid from the node, as it's useless for other instances of FF
       selected.push(pub.utils.cloneObject(node));
+    }
+    return selected;
+  };
+  
+  pub.getCurrentSelectedwithIndex = function(){
+    var selectCount = pub.treeView.selection.count;
+    var selectedIndex = pub.UIutils.getAllSelectedIndex(pub.treeView);
+    //verify 
+    if(selectCount!=selectedIndex.length){
+      console.log("Error when getting selected rows");
+    }
+    var selected = {};
+    for(var i in selectedIndex){
+      var node = pub.treeView.visibleData[selectedIndex[i]];
+      
+      selected[selectedIndex[i]]=pub.utils.cloneObject(node);
     }
     return selected;
   };
@@ -218,8 +234,7 @@ pub.mainThread.prototype = {
 	};
   
   pub.externalCall = function(func){
-    var sel = pub.getCurrentSelected();
-    func(sel);
+    func(pub);
   };
   pub.keypress = function(event) {
     if(!event){
