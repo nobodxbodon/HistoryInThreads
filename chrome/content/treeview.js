@@ -117,18 +117,27 @@ com.wuxuan.fromwheretowhere.mainView = function(){
     }
     
     item.isFolded = true;
+    var selfRow=item.hidden?0:1;
+    var shownChildren=0;
     for (var i = 0; i < item.children.length; i++) {  
-      vis.splice(idx + i + 1, 0, item.children[i]);
+      if(!item.children[i].hidden){
+        vis.splice(idx + shownChildren + selfRow, 0, item.children[i]);
+        shownChildren++;
+      }
     }
     // adjust the index offset of the node to expand
     var offset = 0;
+    
+    shownChildren=0;
     for (var i = 0; i < item.children.length; i++) {
       var child = item.children[i];
-      offset += this.expandFromNodeInTree(child, idx+i+1+offset);
+      offset += this.expandFromNodeInTree(child, idx+shownChildren+selfRow+offset);
+      if(!item.children[i].hidden)
+        shownChildren++;
     }
     //only add the length of its own direct children, the children will count in the length of their own children themselves
-    this.treeBox.rowCountChanged(idx + 1, item.children.length);
-    return offset+item.children.length;
+    this.treeBox.rowCountChanged(idx + selfRow, shownChildren);
+    return offset+shownChildren;
   },
   
   addSuspensionPoints: function(level, idx) {

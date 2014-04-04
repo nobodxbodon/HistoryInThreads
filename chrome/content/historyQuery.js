@@ -108,7 +108,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	if(range!="")
   		range=" where "+range;
   	var term = "SELECT hv.id, hv.from_visit, hv.place_id, hv.visit_date, hv.visit_type, p.url, p.title FROM moz_historyvisits hv join moz_places p on hv.place_id=p.id" + range + " order by hv.visit_date desc";
-  	//console.log("search term:"+term);
+  	console.log("search term:"+term);
   	var statement = pub.mDBConn.createStatement(term);
     try {
       while (statement.executeStep()) {
@@ -144,14 +144,15 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  visit.icon=pub.mapIcon[visit.url];
   	  
   	  //check if the visit after is redirect: 5- perm redirect; 6- temp
-  	  // skip them
+  	  // skip them TODO: filter them in UI, so that it still keeps all info
   	  if(i>=1){
   	  	visitAfter = visits[i-1];
   	  	if(visitAfter.visit_type==5 || visitAfter.visit_type==6){
   	  	//i--,visitAfter = visits[i-1])
   	  		//console.log(visitAfter.id+"<-"+visitAfter.from_visit+" to "+visitAfter.id+"<-"+visit.from_visit);
-  	  		visitAfter.from_visit=visit.from_visit;
-  	  		continue;
+  	  		//visitAfter.from_visit=visit.from_visit;
+  	  		//continue;
+  	  		visit.hidden=true;
   	  	}
   	  }
   	  
@@ -159,7 +160,10 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  var fromVisit = mapId[visit.from_visit];
   	  //console.log("fromVisit:"+fromVisit);
   	  if(fromVisit!=null){
-  	    visit.level=fromVisit.level+1;
+  	    if(visit.hidden)
+  	      visit.level=fromVisit.level;
+  	    else
+  	      visit.level=fromVisit.level+1;
   	    fromVisit.isContainer=true;
   	  	if(fromVisit.children==null)
   	  	  fromVisit.children=[];
