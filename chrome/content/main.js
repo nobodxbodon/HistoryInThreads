@@ -217,8 +217,9 @@ pub.mainThread.prototype = {
 		pub.treeView.findNext();
 	};
   
-  pub.deleteSelected = function(event){
-    console.log("TODO: delete");
+  pub.externalCall = function(func){
+    var sel = pub.getCurrentSelected();
+    func(sel);
   };
   pub.keypress = function(event) {
     if(!event){
