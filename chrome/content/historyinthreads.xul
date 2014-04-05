@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <?xul-overlay href="chrome://clear_history_by_threads/content/contextmenu.xul"?>
+<?xul-overlay href="chrome://share_history_by_threads/content/contextmenu.xul"?>
 <!DOCTYPE overlay SYSTEM "chrome://history_in_threads/locale/hit.dtd">
 <?xml-stylesheet href="chrome://history_in_threads/skin/overlay.css" type="text/css"?>  
 

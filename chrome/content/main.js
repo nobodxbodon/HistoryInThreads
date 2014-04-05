@@ -40,9 +40,9 @@ pub.mainThread = function(threadID, item, idx, query, findNext) {
 pub.mainThread.prototype = {
   run: function() {
     try {
-			if(pub.isNewSession(this.item))
+			/*if(pub.isNewSession(this.item))
 				pub.alreadyExpandedPids = [];
-			pub.alreadyExpandedPids.push(this.item.placeId);
+			pub.alreadyExpandedPids.push(this.item.placeId);*/
       
       // This is where we react to the completion of the working thread.
       pub.treeView.expandFromNodeInTree(this.item, this.idx, true);

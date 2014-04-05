@@ -143,27 +143,10 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  //TODO: just need to assign to those with searchterm
   	  visit.icon=pub.mapIcon[visit.url];
   	  
-  	  //check if the visit after is redirect: 5- perm redirect; 6- temp
-  	  // skip them TODO: filter them in UI, so that it still keeps all info
-  	  if(i>=1){
-  	  	visitAfter = visits[i-1];
-  	  	if(visitAfter.visit_type==5 || visitAfter.visit_type==6){
-  	  	//i--,visitAfter = visits[i-1])
-  	  		//console.log(visitAfter.id+"<-"+visitAfter.from_visit+" to "+visitAfter.id+"<-"+visit.from_visit);
-  	  		//visitAfter.from_visit=visit.from_visit;
-  	  		//continue;
-  	  		visit.hidden=true;
-  	  	}
-  	  }
-  	  
   	  //if follow a link, visit_type=1
   	  var fromVisit = mapId[visit.from_visit];
   	  //console.log("fromVisit:"+fromVisit);
   	  if(fromVisit!=null){
-  	    if(visit.hidden)
-  	      visit.level=fromVisit.level;
-  	    else
-  	      visit.level=fromVisit.level+1;
   	    fromVisit.isContainer=true;
   	  	if(fromVisit.children==null)
   	  	  fromVisit.children=[];
@@ -177,7 +160,45 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  //add to visit_id
   	  mapId[visit.id]=visit;
   	}
+  	
+  	//go through all top nodes and mark hidden
+  	
+  	for(var i=0;i<pub.tops.length;i++){
+  	  var top = pub.tops[i];
+  	  pub.hideRedirection(top);
+  	  pub.setLevel(top,-1);
+  	}
+  	
   	//console.log("after constructing trees:"+pub.tops.length);
+  };
+  
+  pub.hideRedirection=function(node){
+    var children = node.children;
+    if(children){
+      for(var i=0;i<children.length;i++){
+        if(pub.hideRedirection(children[i])){
+          node.hidden=true;
+        }
+      }
+    }
+    
+    if(node.visit_type==5 || node.visit_type==6)
+      return true;
+    return false;
+  };
+  
+  pub.setLevel=function(node, level){
+    if(node.hidden){
+      node.level=level;
+    }else{
+      node.level=level+1;
+    }
+    var children = node.children;
+    if(children){
+      for(var i=0;i<children.length;i++){
+        pub.setLevel(children[i], node.level);
+      }
+    }
   };
   
   pub.includePeriod = function(small, large){
@@ -198,6 +219,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   
   
   pub.getAllVisits = function(searchterm, period){
+    var startTime = new Date();
     var time=pub.getTime(period);
 	var fUpdateIcon = pub.needUpdateIcon(period);
   	//console.log("get visits by words:"+searchterm+" during:"+time);
@@ -230,7 +252,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  pub.lastPeriod = period;
   	  pub.updateVisitsInRange(time);
   	}
-  	
+  	console.log("done get visits:"+(new Date()-startTime));
   };
   
   pub.buildPeriodTerm = function(time, field){
