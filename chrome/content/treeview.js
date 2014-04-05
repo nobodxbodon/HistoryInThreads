@@ -105,39 +105,29 @@ com.wuxuan.fromwheretowhere.mainView = function(){
   },
   
   //expand using the children cached in item, hopefully save expanding time
-  expandFromNodeInTree: function(item, idx) {
+  expandFromNodeInTree: function(item, idx, top) {
     var vis = this.visibleData;
-    if (!item.children || item.children.length==0) {
-      return 0;
-    }else{
-      //if it was considered non-related, don't expand
-      if(item.notRelated){
-        return 0;
-      }
-    }
     
     item.isFolded = true;
-    var selfRow=item.hidden?0:1;
-    var shownChildren=0;
-    for (var i = 0; i < item.children.length; i++) {  
-      if(!item.children[i].hidden){
-        vis.splice(idx + shownChildren + selfRow, 0, item.children[i]);
-        shownChildren++;
-      }
+    var selfRow=(item.hidden||top)?0:1;
+    if(!item.hidden && !top){
+      //console.log("insert "+item.label+" "+(idx + selfRow));
+      vis.splice(idx + 1, 0, item);
     }
     // adjust the index offset of the node to expand
     var offset = 0;
     
-    shownChildren=0;
-    for (var i = 0; i < item.children.length; i++) {
-      var child = item.children[i];
-      offset += this.expandFromNodeInTree(child, idx+shownChildren+selfRow+offset);
-      if(!item.children[i].hidden)
-        shownChildren++;
+    var shownChildren=0;
+    if(item.children){
+      for (var i = 0; i < item.children.length; i++) {
+        var child = item.children[i];
+        offset += this.expandFromNodeInTree(child, idx+selfRow+offset);
+      }
     }
     //only add the length of its own direct children, the children will count in the length of their own children themselves
-    this.treeBox.rowCountChanged(idx + selfRow, shownChildren);
-    return offset+shownChildren;
+    //console.log("expand "+item.label+" "+(idx + selfRow) + " "+selfRow);
+    this.treeBox.rowCountChanged(idx + selfRow, selfRow);
+    return offset;
   },
   
   addSuspensionPoints: function(level, idx) {

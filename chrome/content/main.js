@@ -45,7 +45,7 @@ pub.mainThread.prototype = {
 			pub.alreadyExpandedPids.push(this.item.placeId);
       
       // This is where we react to the completion of the working thread.
-      pub.treeView.expandFromNodeInTree(this.item, this.idx);
+      pub.treeView.expandFromNodeInTree(this.item, this.idx, true);
 			if(this.findNext){
 				//alert("find Next");
 				pub.treeView.findNext(this.idx);
