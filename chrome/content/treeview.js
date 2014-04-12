@@ -219,31 +219,6 @@ com.wuxuan.fromwheretowhere.mainView = function(){
   selectionChanged: function() {},  
   cycleCell: function(idx, column) {},  
   performAction: function(action) {},  
-  performActionOnCell: function(action, index, column) {},  
-  getRowProperties: function(idx, column, prop) {},  
-  
-  getCellProperties: function(row,col,props){
-    var vis = this.visibleData;
-    var pid = vis[row].placeId;
-    var haveKeywords = main.pidwithKeywords.indexOf(pid);
-		var prop = "";
-    //CAN'T alert here!
-    //in case pid is null, which means new imported nodes
-    if(pid && pid==main.retrievedId){
-      prop+="makeItRed ";
-    }else if(haveKeywords!=-1 || (vis[row].placeId==null && vis[row].haveKeywords)){
-      prop+="makeItBlue ";
-    }
-    if(devOptions){
-      var pIdx = this.getParentIndex(row);
-      if(pIdx!=-1 && this.visibleData[row].label==this.visibleData[pIdx].label){
-				prop+="makeItSmall";
-      }
-    }
-		return prop;
-  },
-  
-  getColumnProperties: function(column, element, prop) {},
   click: function() {}
 }};
 	

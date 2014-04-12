@@ -108,7 +108,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	if(range!="")
   		range=" where "+range;
   	var term = "SELECT hv.id, hv.from_visit, hv.place_id, hv.visit_date, hv.visit_type, p.url, p.title FROM moz_historyvisits hv join moz_places p on hv.place_id=p.id" + range + " order by hv.visit_date desc";
-  	console.log("search term:"+term);
+  	//console.log("search term:"+term);
   	var statement = pub.mDBConn.createStatement(term);
     try {
       while (statement.executeStep()) {
@@ -166,7 +166,11 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	for(var i=0;i<pub.tops.length;i++){
   	  var top = pub.tops[i];
   	  pub.hideRedirection(top);
+  	  
+  	  //fix: there are top nodes going to redirect immediately: top node always shown
+  	  top.hidden=false;
   	  pub.setLevel(top,-1);
+  	  
   	}
   	
   	//console.log("after constructing trees:"+pub.tops.length);
@@ -252,7 +256,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  pub.lastPeriod = period;
   	  pub.updateVisitsInRange(time);
   	}
-  	console.log("done get visits:"+(new Date()-startTime));
+  	//console.log("done get visits:"+(new Date()-startTime));
   };
   
   pub.buildPeriodTerm = function(time, field){
@@ -353,7 +357,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
             item.style.listStyleImage =
               'url("' + pub.fis.getFaviconLinkForIcon(aURI).spec + '")';
           }});
-      //return pub.fis.getFaviconImageForPage(uri).spec;
     }catch(e){
       //alert(url);
       return null;
