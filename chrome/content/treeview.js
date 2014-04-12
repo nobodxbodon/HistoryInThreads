@@ -57,7 +57,7 @@ com.wuxuan.fromwheretowhere.mainView = function(){
   getCellText: function(idx, column) {
     if(this.visibleData[idx]) {
       if(column.id == "element") {
-        return this.visibleData[idx].label;
+        return this.getFirstLabel(this.visibleData[idx]);
       } else if (column.id == "url") {
 	return this.visibleData[idx].url;
       } else if (column.id == "date") {
@@ -66,7 +66,16 @@ com.wuxuan.fromwheretowhere.mainView = function(){
     }
     return "NotDefined";
   },
-    
+  
+  getFirstLabel: function(item){
+    var label = item.label;
+    if(label){
+    }else if(item.children){
+      return this.getFirstLabel(item.children[0]);
+    }
+    return label;
+  },
+  
   isContainer: function(idx){
     if(this.visibleData[idx]){
       return this.visibleData[idx].isContainer;
