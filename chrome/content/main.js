@@ -40,14 +40,8 @@ pub.mainThread = function(threadID, item, idx, query, findNext) {
 pub.mainThread.prototype = {
   run: function() {
     try {
-			/*if(pub.isNewSession(this.item))
-				pub.alreadyExpandedPids = [];
-			pub.alreadyExpandedPids.push(this.item.placeId);*/
-      
-      // This is where we react to the completion of the working thread.
       pub.treeView.expandFromNodeInTree(this.item, this.idx, true);
 			if(this.findNext){
-				//alert("find Next");
 				pub.treeView.findNext(this.idx);
 			}
     } catch(err) {
@@ -67,19 +61,13 @@ pub.mainThread.prototype = {
 
   pub.selectNodeLocal = null;
   pub.showMenuItems = function(){
-    var localItem = document.getElementById("local");
 		var switchToTab = document.getElementById("switchToTab");
     var openinnewtab = document.getElementById("openinnewtab");
-    var shareThread = document.getElementById("share");
     
 	//if # of selected item > 1, just show "open in new tab"
 	if(pub.treeView.selection.count==1){
 	  var node = pub.treeView.visibleData[pub.treeView.selection.currentIndex];
-	  if(node){
-		var exists = false;//com.wuxuan.fromwheretowhere.sb.urls.indexOf(node.url);
-		pub.selectNodeLocal = exists;
-		localItem.hidden = (exists == -1);
-	  }
+	  
 		//check if the tab is opened already
 		var foundTab = pub.UIutils.findTabByDocUrl(null, node.url);
 		openinnewtab.hidden = (node==null || foundTab.tab!=null);
@@ -87,11 +75,7 @@ pub.mainThread.prototype = {
 		switchToTab.fromwheretowhere = {};
 		switchToTab.fromwheretowhere.foundTab = foundTab;
 	}else if(pub.treeView.selection.count==0){
-    /*var selectedIndex = pub.UIutils.getAllSelectedIndex(pub.treeView);
-    var propertyItem = document.getElementById("export-menu");
-		var noneSelected = (selectedIndex.length==0);
-    propertyItem.hidden = noneSelected;*/
-		shareThread.hidden = noneSelected;
+		
 	}else{
 	  openinnewtab.hidden = false;
 	  switchToTab.hidden =true;
@@ -120,22 +104,6 @@ pub.mainThread.prototype = {
       
       //clean away id/pid from the node, as it's useless for other instances of FF
       selected.push(pub.utils.cloneObject(node));
-    }
-    return selected;
-  };
-  
-  pub.getCurrentSelectedwithIndex = function(){
-    var selectCount = pub.treeView.selection.count;
-    var selectedIndex = pub.UIutils.getAllSelectedIndex(pub.treeView);
-    //verify 
-    if(selectCount!=selectedIndex.length){
-      console.log("Error when getting selected rows");
-    }
-    var selected = {};
-    for(var i in selectedIndex){
-      var node = pub.treeView.visibleData[selectedIndex[i]];
-      
-      selected[selectedIndex[i]]=pub.utils.cloneObject(node);
     }
     return selected;
   };
@@ -177,16 +145,10 @@ pub.mainThread.prototype = {
       	
 		var querytime = {};
         var topNodes = [];
-        //if(this.words.length!=0 ||  this.optional.length!=0){
-          
-          
           topNodes = pub.history.getThreads(this.keywords, this.period); //need to reverse to get the latest visits on top
-          //alert(topNodes.length);
           topNodes.reverse();
-          //alert("after reverse, got tops:"+topNodes.length);
           //console.log("got tops:"+topNodes.length);
           
-		//}		
 				//refresh tree, remove all visibledata and add new ones
         //pub.treeView.delSuspensionPoints(-1);
         
@@ -218,7 +180,6 @@ pub.mainThread.prototype = {
   	}
   	
     //console.log("search with period:"+JSON.stringify(period));
-    //alert(Application.storage.get("currentPage", false));
     pub.treeView.treeBox.rowCountChanged(0, -pub.treeView.visibleData.length);
     //pub.treeView.addSuspensionPoints(-1, -1);
     pub.keywords = document.getElementById("keywords").value;

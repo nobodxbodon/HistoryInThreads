@@ -3,8 +3,7 @@ com.wuxuan.fromwheretowhere.mainView = function(){
   var pub={};
 
   var devOptions=false;
-  //var testConstruct=(function(){alert("mainView cons here");})();
-  
+	
   pub.createView = function(main){
     return {
   // have to separate the looks of node from the content!!!!!!
@@ -93,7 +92,6 @@ com.wuxuan.fromwheretowhere.mainView = function(){
   isEditable: function(idx, column)  { return false; },  
   
   getParentIndex: function(idx) {  
-    //if (this.isContainer(idx)) return -1;  
     for (var t = idx - 1; t >= 0 ; t--) {  
       if (this.visibleData[t].level<this.visibleData[idx].level) return t;  
     }
@@ -214,12 +212,7 @@ com.wuxuan.fromwheretowhere.mainView = function(){
   },  
   
   getImageSrc: function(idx, column) {
-  	
     var vis = this.visibleData;
-    /*var treeItem = this.view.getItemAtIndex(idx);
-    if(column.id == "element") {
-      main.history.getImagefromUrl(vis[idx].url, treeItem);
-    }*/
     if(column.id == "element") {
   		return vis[idx].icon;
   	}
@@ -235,7 +228,6 @@ com.wuxuan.fromwheretowhere.mainView = function(){
 }};
 	
   pub.init = function(main){
-    //console.log("treeview init");
     main.init();
     // Main Tree definition
     pub.utils = com.wuxuan.fromwheretowhere.utils;
