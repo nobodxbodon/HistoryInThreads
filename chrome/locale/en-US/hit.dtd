@@ -2,7 +2,7 @@
 <!ENTITY mainMenu.recommend "Auto-refresh Suggestion">
 
 <!ENTITY contextMenu.switchToTab "Switch to Tab">
-<!ENTITY contextMenu.openinnewtab "Open Page in New Tab">
+<!ENTITY contextMenu.openinnewtab "Open Link in New Tab">
 <!ENTITY contextMenu.openlocalcopy "Open Local Copy">
 <!ENTITY contextMenu.export "Export as ...">
 <!ENTITY contextMenu.formatJSON "JSON">
@@ -36,3 +36,12 @@
 <!ENTITY option.toggleSugPanel "Show/hide Suggestion Panel">
 <!ENTITY option.related.showRelatedKeywords "Show Related Keywords">
 <!ENTITY option.related.highFrequency "High Frequency Largest">
+
+<!ENTITY period.today "Today">
+<!ENTITY period.yesterday "Yesterday">
+<!ENTITY period.last7 "Last 7 Days">
+<!ENTITY period.thismonth "This Month">
+<!ENTITY period.thisyear "This Year">
+<!ENTITY period.all "All">
+
+<!ENTITY placeholder.search "Search History">

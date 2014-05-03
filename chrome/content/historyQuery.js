@@ -1,9 +1,7 @@
 //independent of searching/treeview or recommendation
 com.wuxuan.fromwheretowhere.historyQuery = function(){
-//const {Cc,Ci} = require("chrome");
 
   var pub={};
-  
   
   pub.DAYTIME=(24*60*60*1000000);
   
@@ -31,7 +29,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 
   pub.openPlacesDatabase = function(){
     var db = Components.classes["@mozilla.org/browser/nav-history-service;1"].  
-                      getService(Components.interfaces.nsPIPlacesDatabase).DBConnection;  
+              getService(Components.interfaces.nsPIPlacesDatabase).DBConnection;  
     return db;
   };
 
@@ -225,7 +223,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   pub.getAllVisits = function(searchterm, period){
     var startTime = new Date();
     var time=pub.getTime(period);
-	var fUpdateIcon = pub.needUpdateIcon(period);
   	//console.log("get visits by words:"+searchterm+" during:"+time);
   	var i=0;
   	for(;i<pub.currentPeriod.length;i++){
@@ -236,12 +233,11 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	//console.log(searchterm+"?="+pub.lastSearchterm);
   	// when search term differs from last OR period changes, update items that have search terms 
   	if(searchterm!=pub.lastSearchterm || i==pub.currentPeriod.length){
-  	  pub.updateSearchResult(searchterm, time);
+  		pub.updateSearchResult(searchterm, time);
   	  pub.lastSearchterm=searchterm;
   	}
   	  
   	if(i==pub.currentPeriod.length){
-  	  
   	  pub.updateVisitIcons(time);
   	  pub.currentPeriod.push(period);
   	  
@@ -293,9 +289,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	return p;
   };
   
-  pub.needUpdateIcon = function(period) {
-  
-  }
   pub.getTodayStartTime = function() {
   	var now=new Date();
   	var hour = now.getHours();
@@ -315,7 +308,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
       pub.expanded[i].isFolded=false;
     }
     pub.expanded=[];
-	var tops = [];
+		var tops = [];
   	//TODO: remove those without keywords (marked by flag)
   	if(searchterm!=""){
   	  for(var i=0;i<pub.tops.length;i++){
@@ -358,26 +351,9 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
               'url("' + pub.fis.getFaviconLinkForIcon(aURI).spec + '")';
           }});
     }catch(e){
-      //alert(url);
-      return null;
     }
   };
   
-  
-  // Main Datastructure for each Node
-  pub.ReferedHistoryNode = function(id, placeId, label, url, isContainer, isFolded, children, level) {
-    var obj = new Object();
-		//id should be visitId, as moz.historyvisits.id
-    obj.id = id;
-    obj.placeId = placeId;
-    obj.label = label;
-    obj.url = url;
-    obj.isContainer = isContainer;
-    obj.isFolded = isFolded;
-    obj.children = children;
-    obj.level = level;
-    return obj;
-  };
   
   
   return pub;

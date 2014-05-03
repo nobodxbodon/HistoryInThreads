@@ -1,5 +1,6 @@
 content history_in_threads chrome/content/
 
 locale history_in_threads en-US chrome/locale/en-US/
+locale history_in_threads zh-CN chrome/locale/zh-CN/
 
 skin history_in_threads classic/1.0 chrome/skin/

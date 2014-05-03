@@ -10,26 +10,26 @@
 <hbox>
     <menulist id="period_menu">
       <menupopup>
-        <menuitem id="today" label="Today" type="radio" checked="true"
+        <menuitem id="today" label="&period.today;" type="radio" checked="true"
         	oncommand="com.wuxuan.fromwheretowhere.main.search(event)"/>
-        <menuitem id="yesterday" label="Yesterday" type="radio"
+        <menuitem id="yesterday" label="&period.yesterday;" type="radio"
         	oncommand="com.wuxuan.fromwheretowhere.main.search(event)"/>
-        <menuitem id="last7days" label="Last 7 Days" type="radio"
+        <menuitem id="last7days" label="&period.last7;" type="radio"
         	oncommand="com.wuxuan.fromwheretowhere.main.search(event)"/>
-        <menuitem id="thismonth" label="This Month" type="radio"
+        <menuitem id="thismonth" label="&period.thismonth;" type="radio"
         	oncommand="com.wuxuan.fromwheretowhere.main.search(event)"/>
-        <menuitem id="thisyear" label="This Year" type="radio"
+        <menuitem id="thisyear" label="&period.thisyear;" type="radio"
         	oncommand="com.wuxuan.fromwheretowhere.main.search(event)"/>
-        <menuitem id="all" label="All" type="radio"
+        <menuitem id="all" label="&period.all;" type="radio"
         	oncommand="com.wuxuan.fromwheretowhere.main.search(event)"/>
       </menupopup>
     </menulist>
-  <textbox id="keywords" type="search" searchbutton="true" placeholder="Search" multiline="false" flex="1" onkeypress="com.wuxuan.fromwheretowhere.main.keypress(event)"/>
+  <textbox id="keywords" type="search" searchbutton="true" placeholder="&placeholder.search;" multiline="false" flex="1" onkeypress="com.wuxuan.fromwheretowhere.main.keypress(event)"/>
 </hbox>
 
 
   <menupopup id="hit_contextmenu">
-        <menuitem id="hit_open_new_tab" label="Open in new tab"
+        <menuitem id="hit_open_new_tab" label="&contextMenu.openinnewtab;"
         	oncommand="com.wuxuan.fromwheretowhere.main.openlink()"/>
       </menupopup>
       

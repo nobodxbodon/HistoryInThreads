@@ -1,0 +1,15 @@
+
+<!ENTITY contextMenu.openinnewtab "在新标签页中打开">
+
+<!ENTITY table.title "名称">
+<!ENTITY table.url "位置">
+<!ENTITY table.date "最近访问">
+
+<!ENTITY period.today "今天">
+<!ENTITY period.yesterday "昨天">
+<!ENTITY period.last7 "过去7天">
+<!ENTITY period.thismonth "本月">
+<!ENTITY period.thisyear "今年">
+<!ENTITY period.all "所有">
+
+<!ENTITY placeholder.search "搜索历史记录">
