@@ -36,9 +36,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   pub.mDBConn = pub.openPlacesDatabase();
   pub.ios = Components.classes["@mozilla.org/network/io-service;1"].
 	        getService(Components.interfaces.nsIIOService);
-  pub.fis = Components.classes["@mozilla.org/browser/favicon-service;1"].
-          getService(Components.interfaces.nsIFaviconService);
-  
   
   pub.histServ =
   	Components.classes["@mozilla.org/browser/nav-history-service;1"].
@@ -340,18 +337,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
       }
     }
     return false;
-  };
-  
-  pub.getImagefromUrl = function(url, item){
-    try{
-      var uri = pub.ios.newURI(url, null, null);
-      pub.fis.getFaviconURLForPage(
-          uri, { onComplete: function (aURI, aDataLen, aData, aMimeType) {
-            item.style.listStyleImage =
-              'url("' + pub.fis.getFaviconLinkForIcon(aURI).spec + '")';
-          }});
-    }catch(e){
-    }
   };
   
   
