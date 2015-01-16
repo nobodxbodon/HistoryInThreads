@@ -140,16 +140,6 @@ com.wuxuan.fromwheretowhere.mainView = function(){
     return offset;
   },
   
-  addSuspensionPoints: function(level, idx) {
-    var sp = main.history.ReferedHistoryNode(-1, -1, "...", null, false, false, [], level+1);
-    this.visibleData.splice(idx+ 1, 0, sp);
-    this.treeBox.rowCountChanged(idx + 1, 1);
-  },
-  delSuspensionPoints: function(idx) {
-    this.visibleData.splice(idx+ 1, 1);
-    this.treeBox.rowCountChanged(idx + 1, -1);
-  },
-  
   //search from selection, get the one with keywords or the src page (blue or red)
   findNext: function(idx){
     if(idx==null &&this.selection!=null)
@@ -201,15 +191,13 @@ com.wuxuan.fromwheretowhere.mainView = function(){
     else {
       //add expanded item to history
       main.history.expanded.push(item);
-      //FIX: Warning: reference to undefined property main.main.query
-      if(main.query)
-        main.main.dispatch(new main.mainThread(1, item, idx, main.query, findNext), main.main.DISPATCH_NORMAL);
-      else
-        main.main.dispatch(new main.mainThread(1, item, idx, null, findNext), main.main.DISPATCH_NORMAL);
-      
+      this.expandFromNodeInTree(item, idx, true);
+			if(findNext){
+				this.findNext(idx);
+			}
     }  
     this.treeBox.invalidateRow(idx);
-  },  
+  },
   
   getImageSrc: function(idx, column) {
     var vis = this.visibleData;

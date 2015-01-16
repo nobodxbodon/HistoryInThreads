@@ -19,6 +19,13 @@ com.wuxuan.fromwheretowhere.main = function(){
 	}
   };
   
+	pub.expandTree = function(treeView) {
+		for (var i = 0; i < treeView.rowCount; i++) {
+			if (treeView.isContainer(i) && !treeView.isContainerOpen(i) && treeView.getLevel(i)==0)
+				treeView.toggleOpenState(i);
+		}
+	};
+	
 	pub.DEBUG = false;
   // Utils functions finish
   pub.keywords = "";
@@ -28,36 +35,6 @@ com.wuxuan.fromwheretowhere.main = function(){
 	pub.isNewSession = function(item){
 		return item.level==0;
 	};
-	
-pub.mainThread = function(threadID, item, idx, query, findNext) {
-  this.threadID = threadID;
-  this.item = item;
-  this.idx = idx;
-	this.query = query;
-	this.findNext = findNext;
-};
-
-pub.mainThread.prototype = {
-  run: function() {
-    try {
-      pub.treeView.expandFromNodeInTree(this.item, this.idx, true);
-			if(this.findNext){
-				pub.treeView.findNext(this.idx);
-			}
-    } catch(err) {
-      Components.utils.reportError(err);
-    }
-  },
-  
-  QueryInterface: function(iid) {
-    if (iid.equals(Components.interfaces.nsIRunnable) ||
-        iid.equals(Components.interfaces.nsISupports)) {
-            return this;
-    }
-    throw Components.results.NS_ERROR_NO_INTERFACE;
-  }
-};
-
 
   pub.selectNodeLocal = null;
   pub.showMenuItems = function(){
@@ -91,6 +68,10 @@ pub.mainThread.prototype = {
     pub.getURLfromNode(pub.treeView);
   };
   
+	pub.expandAll = function(){
+		pub.expandTree(pub.treeView);
+	};
+	
   pub.getCurrentSelected = function(){
     var selectCount = pub.treeView.selection.count;
     var selectedIndex = pub.UIutils.getAllSelectedIndex(pub.treeView);

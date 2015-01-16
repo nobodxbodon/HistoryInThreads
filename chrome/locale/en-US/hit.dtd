@@ -1,5 +1,6 @@
 
 <!ENTITY contextMenu.openinnewtab "Open Link in New Tab">
+<!ENTITY contextMenu.expandall "Expand All">
 
 <!ENTITY table.title "Name">
 <!ENTITY table.url "Location">

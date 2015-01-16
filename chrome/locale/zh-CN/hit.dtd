@@ -1,5 +1,6 @@
 
 <!ENTITY contextMenu.openinnewtab "在新标签页中打开">
+<!ENTITY contextMenu.expandall "全部展开">
 
 <!ENTITY table.title "名称">
 <!ENTITY table.url "位置">
