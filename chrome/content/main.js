@@ -77,7 +77,7 @@ com.wuxuan.fromwheretowhere.main = function(){
     var selectedIndex = pub.UIutils.getAllSelectedIndex(pub.treeView);
     //verify 
     if(selectCount!=selectedIndex.length){
-      console.log("Error when getting selected rows");
+      alert("Error when getting selected rows");
     }
     var selected = [];
     for(var i in selectedIndex){
@@ -128,16 +128,12 @@ com.wuxuan.fromwheretowhere.main = function(){
         var topNodes = [];
           topNodes = pub.history.getThreads(this.keywords, this.period); //need to reverse to get the latest visits on top
           topNodes.reverse();
-          //console.log("got tops:"+topNodes.length);
           
 				//refresh tree, remove all visibledata and add new ones
-        //pub.treeView.delSuspensionPoints(-1);
-        
         //when allPpids = null/[], show "no result with xxx", to distinguish with normal nothing found
 		
         pub.treeView.visibleData = topNodes;
         pub.treeView.treeBox.rowCountChanged(0, topNodes.length);
-        //console.log("done refresh tree");
       } catch(err) {
         Components.utils.reportError(err);
       }
@@ -160,9 +156,7 @@ com.wuxuan.fromwheretowhere.main = function(){
   	  period = event.target.getAttribute("id");
   	}
   	
-    //console.log("search with period:"+JSON.stringify(period));
     pub.treeView.treeBox.rowCountChanged(0, -pub.treeView.visibleData.length);
-    //pub.treeView.addSuspensionPoints(-1, -1);
     pub.keywords = document.getElementById("keywords").value;
 		pub.query = pub.utils.getIncludeExcluded(pub.keywords);
 	pub.query.period = period;
@@ -171,7 +165,6 @@ com.wuxuan.fromwheretowhere.main = function(){
   };
 
 	pub.findNext = function(){
-		//pub.treeView.toggleOpenState(0);
 		pub.treeView.findNext();
 	};
   
@@ -189,6 +182,20 @@ com.wuxuan.fromwheretowhere.main = function(){
     }
   };
   
+	pub.onTreeClicked = function(event){
+		var tree = document.getElementById("elementList");
+		var tbo = tree.treeBoxObject;
+	
+		// get the row, col and child element at the point
+		var row = { }, col = { }, child = { };
+		tbo.getCellAt(event.clientX, event.clientY, row, col, child);
+	
+		var url = tree.view.getCellText(row.value, {"id":"url"});
+		if(event.button === 1) {
+			window.open(url);
+		}
+	};
+
   pub.mainWindow = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
         .getInterface(Components.interfaces.nsIWebNavigation)
         .QueryInterface(Components.interfaces.nsIDocShellTreeItem)

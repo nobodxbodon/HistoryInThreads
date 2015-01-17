@@ -117,11 +117,9 @@ com.wuxuan.fromwheretowhere.mainView = function(){
   //expand using the children cached in item, hopefully save expanding time
   expandFromNodeInTree: function(item, idx, top) {
     var vis = this.visibleData;
-    //console.log(item.id+" hidden: "+item.hidden);
     item.isFolded = true;
     var selfRow=(item.hidden||top)?0:1;
     if(!item.hidden && !top){
-      //console.log("insert "+item.id+" "+(idx + 1));
       vis.splice(idx + 1, 0, item);
     }
     // adjust the index offset of the node to expand
@@ -135,7 +133,6 @@ com.wuxuan.fromwheretowhere.mainView = function(){
       }
     }
     //only add the length of its own direct children, the children will count in the length of their own children themselves
-    //console.log("expand "+item.id+" "+(idx + selfRow) + " "+selfRow);
     this.treeBox.rowCountChanged(idx + selfRow, selfRow);
     return offset;
   },
@@ -170,8 +167,7 @@ com.wuxuan.fromwheretowhere.mainView = function(){
   },
   
   toggleOpenState: function(idx, findNext) {  
-    var item = this.visibleData[idx];  
-    //console.log(item);
+    var item = this.visibleData[idx];
     if (!item.isContainer) return;  
   
     if (item.isFolded) {  

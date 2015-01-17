@@ -43,7 +43,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   
   pub.updateVisitIcons = function(time){
     pub.mapIcon={};
-    //console.log("updateVisitIcons:"+time);
   	var opts = pub.histServ.getNewQueryOptions();
 	var query = pub.histServ.getNewQuery();
 	query.absoluteBeginTime = time.since;
@@ -61,7 +60,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 	
     	// "node" attributes contains the information (e.g. URI, title, time, icon...)
    		// see : https://developer.mozilla.org/en/nsINavHistoryResultNode
-    	//console.log(node.icon+" "+node.uri+" "+node.title);
 		pub.mapIcon[node.uri]=node.icon;
 	}
 	
@@ -87,7 +85,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 	for (var i = 0; i < cont.childCount; i ++) {
 
     	var node = cont.getChild(i);
-    	//console.log(node.icon+" "+node.uri+" "+node.title);
 		pub.mapTerm[node.time]=true;
 	}
 	
@@ -103,7 +100,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	if(range!="")
   		range=" where "+range;
   	var term = "SELECT hv.id, hv.from_visit, hv.place_id, hv.visit_date, hv.visit_type, p.url, p.title FROM moz_historyvisits hv join moz_places p on hv.place_id=p.id" + range + " order by hv.visit_date desc";
-  	//console.log("search term:"+term);
   	var statement = pub.mDBConn.createStatement(term);
     try {
       while (statement.executeStep()) {
@@ -115,14 +111,11 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 		visit.visit_type=statement.getInt32(4);
 		visit.url=statement.getString(5);
 		visit.label=statement.getString(6);
-		//console.log(JSON.stringify(visit));
 		visits.push(visit);
       }
       statement.reset();
-      //console.log("visit num:"+visits.length);
     } 
     catch (e) {
-      console.log("error in getAllvisits:"+JSON.stringify(e));
       statement.reset();
     }
     
@@ -131,7 +124,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
 	pub.tops = [];
 	var visit = null;
 	var visitAfter = null;
-	//console.log("getThreads visits length:"+visits.length);
   	for(var i=visits.length-1;i>=0;i--){
   	  visit = visits[i];
   	  
@@ -140,7 +132,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  
   	  //if follow a link, visit_type=1
   	  var fromVisit = mapId[visit.from_visit];
-  	  //console.log("fromVisit:"+fromVisit);
   	  if(fromVisit!=null){
   	    fromVisit.isContainer=true;
   	  	if(fromVisit.children==null)
@@ -148,7 +139,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	    fromVisit.children.push(visit);
   	  }//otherwise 2 - type/autocomplate; 3 - click on bookmark; 4 - embedded url
   	  else{
-  	  	//console.log(visit);
   	    visit.level=0;
   	    pub.tops.push(visit);
   	  }
@@ -201,7 +191,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   };
   
   pub.includePeriod = function(small, large){
-    //console.log("check include:"+small+"<"+large);
     if(small==large)
       return true;
     else if(small==pub.TODAY && (large==pub.LAST7DAYS || large==pub.THISMONTH || large==pub.THISYEAR || large==pub.ALL))
@@ -220,14 +209,12 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   pub.getAllVisits = function(searchterm, period){
     var startTime = new Date();
     var time=pub.getTime(period);
-  	//console.log("get visits by words:"+searchterm+" during:"+time);
   	var i=0;
   	for(;i<pub.currentPeriod.length;i++){
   	  if(pub.includePeriod(period,pub.currentPeriod[i])){
   	    break;
   	  }
   	}
-  	//console.log(searchterm+"?="+pub.lastSearchterm);
   	// when search term differs from last OR period changes, update items that have search terms 
   	if(searchterm!=pub.lastSearchterm || i==pub.currentPeriod.length){
   		pub.updateSearchResult(searchterm, time);
@@ -240,7 +227,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  
   	}
   	
-    //console.log("in getAllVisits, time:"+JSON.stringify(time)+" "+period+" "+pub.lastPeriod);
     //don't update visits unless period changes
     if(period==pub.lastPeriod)
       return;
@@ -249,7 +235,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  pub.lastPeriod = period;
   	  pub.updateVisitsInRange(time);
   	}
-  	//console.log("done get visits:"+(new Date()-startTime));
   };
   
   pub.buildPeriodTerm = function(time, field){
@@ -265,7 +250,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   
   
   pub.getTime = function(period) {
-  	//console.log("start getTime:"+period);
     var p = {since: -1, till: Number.MAX_VALUE};
   	if(period==pub.TODAY){
   	  p.since=pub.getTodayStartTime();
@@ -299,9 +283,7 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   /* for latest visits ordered by latest first, walk them from the earliest, add it to the node based on from_visit, order by visit time*/
   pub.getThreads = function(searchterm, time){
     pub.getAllVisits(searchterm, time);
-    //console.log("fold nodes:"+pub.expanded.length);
     for(var i=0;i<pub.expanded.length;i++){
-      //console.log("fold:"+pub.expanded[i].label);
       pub.expanded[i].isFolded=false;
     }
     pub.expanded=[];
@@ -310,7 +292,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	if(searchterm!=""){
   	  for(var i=0;i<pub.tops.length;i++){
   	    if(pub.hasSearchTerm(pub.tops[i])){
-  	      //console.log("remove:"+tops[i].label);
     	  tops.push(pub.tops[i]);
   		}
   	  }
@@ -319,7 +300,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  	tops.push(pub.tops[i]);
   	  }
   	}
-  	//alert("after filter by search term");
   	return tops;
   };
   

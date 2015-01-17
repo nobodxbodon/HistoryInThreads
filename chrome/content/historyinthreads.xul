@@ -35,7 +35,7 @@
 			oncommand="com.wuxuan.fromwheretowhere.main.expandAll()"/>
       </menupopup>
       
-<tree id="elementList" flex="1">  
+<tree id="elementList" flex="1" onclick="com.wuxuan.fromwheretowhere.main.onTreeClicked(event)">  
   <treecols>  
     <treecol id="element" label="&table.title;" primary="true" flex="4"/>
        <splitter resizeafter="closest">
