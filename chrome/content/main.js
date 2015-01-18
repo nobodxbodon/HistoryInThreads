@@ -14,9 +14,29 @@ com.wuxuan.fromwheretowhere.main = function(){
   
   pub.getURLfromNode = function(treeView) {
     var sel = pub.getCurrentSelected();
-	for(var i in sel){
-		window.open(sel[i].url);
-	}
+		//only when 1 selected, may switch to current tab
+		if(sel.length==1){
+			var switchToTab = document.getElementById("switchToTab");
+			var foundTab = null;
+			if(!switchToTab.fromwheretowhere || !switchToTab.fromwheretowhere.foundTab){
+				var node = pub.treeView.visibleData[pub.treeView.selection.currentIndex];
+				//check if the tab is opened already
+				foundTab = pub.UIutils.findTabByDocUrl(null, node.url);
+			}else{
+				foundTab = switchToTab.fromwheretowhere.foundTab;
+			}
+			if(foundTab.tab){
+				// The URL is already opened. Select this tab.
+				foundTab.browser.selectedTab = foundTab.tab;
+				// Focus *this* browser-window
+				foundTab.window.focus();
+			}else
+				window.open(sel[0].url);
+		}else{
+			for(var i in sel){
+				window.open(sel[i].url);
+			}
+		}
   };
   
 	pub.expandTree = function(treeView) {
@@ -39,7 +59,7 @@ com.wuxuan.fromwheretowhere.main = function(){
   pub.selectNodeLocal = null;
   pub.showMenuItems = function(){
 		var switchToTab = document.getElementById("switchToTab");
-    var openinnewtab = document.getElementById("openinnewtab");
+    var openinnewtab = document.getElementById("hit_open_new_tab");
     
 	//if # of selected item > 1, just show "open in new tab"
 	if(pub.treeView.selection.count==1){
@@ -57,11 +77,6 @@ com.wuxuan.fromwheretowhere.main = function(){
 	  openinnewtab.hidden = false;
 	  switchToTab.hidden =true;
 	}
-  };
-  
-  /* to fix #2, side effect: checking menu items always */
-  pub.doubleClickTreeItem = function(event){
-	pub.openlink();
   };
   
   pub.openlink = function(){
@@ -89,44 +104,21 @@ com.wuxuan.fromwheretowhere.main = function(){
     return selected;
   };
   
-  /* for now there's no circular reference within nodes, so JSON has no problem.
-    TOIMPROVE until there's built-in support, as it should make loop detection more elegant? */
-  //if it's a container, but never opened before, then it has no children.
-  //For now have to manually open it first to get all the children, and then "export the whole trace"
-  pub.exportJSON = function() {
-		var tosave = pub.getCurrentSelected();
-    var json = JSON.stringify(tosave);
-    pub.openPropertyDialog(json);
-  };
-  
-	pub.exportHTML = function() {
-		var tosave = pub.getCurrentSelected();
-		var htmlSrc = pub.utils.exportHTML(tosave);
-		pub.openPropertyDialog(htmlSrc);
-	};
-	
   pub.pidwithKeywords = [];
   	
 	//TODO: call getIncludeExclude here, save passing arguments?
   pub.searchThread = function(threadID, query) {
     this.threadID = threadID;
-    this.keywords = query.origkeywords;
-    this.words = query.words;
-		this.optional = query.optional;
-    this.excluded = query.excluded;
-		this.site = query.site;
 		this.period = query.period;
-		this.fUpdateIcon = query.fUpdateIcon;
-		this.query = query;
+		this.query = query.keyword;
   };
   
   pub.searchThread.prototype = {
     run: function() {
       try {
-      	
-		var querytime = {};
+      	var querytime = {};
         var topNodes = [];
-          topNodes = pub.history.getThreads(this.keywords, this.period); //need to reverse to get the latest visits on top
+          topNodes = pub.history.getThreads(this.query, this.period); //need to reverse to get the latest visits on top
           topNodes.reverse();
           
 				//refresh tree, remove all visibledata and add new ones
@@ -149,18 +141,14 @@ com.wuxuan.fromwheretowhere.main = function(){
   };
   
   pub.search = function(event) {
-  
-  	
   	var period = pub.history.lastPeriod==null?pub.history.TODAY:pub.history.lastPeriod;
   	if(event!=null){
   	  period = event.target.getAttribute("id");
   	}
   	
     pub.treeView.treeBox.rowCountChanged(0, -pub.treeView.visibleData.length);
-    pub.keywords = document.getElementById("keywords").value;
-		pub.query = pub.utils.getIncludeExcluded(pub.keywords);
-	pub.query.period = period;
-    pub.main.dispatch(new pub.searchThread(1, pub.query), pub.main.DISPATCH_NORMAL);
+    pub.query = document.getElementById("keywords").value;
+    pub.main.dispatch(new pub.searchThread(1, {keyword: pub.query, period: period}), pub.main.DISPATCH_NORMAL);
     Application.storage.set("currentURI", "");
   };
 

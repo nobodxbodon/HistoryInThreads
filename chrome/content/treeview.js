@@ -199,7 +199,9 @@ com.wuxuan.fromwheretowhere.mainView = function(){
     var vis = this.visibleData;
     if(column.id == "element") {
   		return vis[idx].icon;
-  	}
+  	} else {
+			return "";
+		}
   },
   
   getProgressMode : function(idx,column) {},  
@@ -207,8 +209,7 @@ com.wuxuan.fromwheretowhere.mainView = function(){
   cycleHeader: function(col, elem) {},  
   selectionChanged: function() {},  
   cycleCell: function(idx, column) {},  
-  performAction: function(action) {},  
-  click: function() {}
+  performAction: function(action) {}
 }};
 	
   pub.init = function(main){

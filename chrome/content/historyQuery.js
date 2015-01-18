@@ -157,8 +157,6 @@ com.wuxuan.fromwheretowhere.historyQuery = function(){
   	  pub.setLevel(top,-1);
   	  
   	}
-  	
-  	//console.log("after constructing trees:"+pub.tops.length);
   };
   
   pub.hideRedirection=function(node){

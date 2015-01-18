@@ -28,12 +28,14 @@
 </hbox>
 
 
-  <menupopup id="hit_contextmenu">
-        <menuitem id="hit_open_new_tab" label="&contextMenu.openinnewtab;"
-        	oncommand="com.wuxuan.fromwheretowhere.main.openlink()"/>
-		<menuitem id="expand_all" label="&contextMenu.expandall;"
-			oncommand="com.wuxuan.fromwheretowhere.main.expandAll()"/>
-      </menupopup>
+  <menupopup id="hit_contextmenu" onpopupshowing="com.wuxuan.fromwheretowhere.main.showMenuItems()">
+	<menuitem id="switchToTab" label="&contextMenu.switchToTab;"
+		oncommand="com.wuxuan.fromwheretowhere.main.openlink()"/>
+    <menuitem id="hit_open_new_tab" label="&contextMenu.openinnewtab;"
+        oncommand="com.wuxuan.fromwheretowhere.main.openlink()"/>
+	<menuitem id="expand_all" label="&contextMenu.expandall;"
+		oncommand="com.wuxuan.fromwheretowhere.main.expandAll()"/>
+  </menupopup>
       
 <tree id="elementList" flex="1" onclick="com.wuxuan.fromwheretowhere.main.onTreeClicked(event)">  
   <treecols>  

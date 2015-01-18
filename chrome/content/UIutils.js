@@ -38,7 +38,7 @@ com.wuxuan.fromwheretowhere.UIutils = function(){
       var numTabs = tabbrowser.browsers.length;
       for (var index = 0; index < numTabs; index++) {
         var currentBrowser = tabbrowser.getBrowserAtIndex(index);
-        if (doc == currentBrowser.contentDocument || url==currentBrowser.currentURI.spec) {//url=pub.currLoc
+        if (doc == currentBrowser.contentDocument || url==currentBrowser.currentURI.spec) {
           foundTab.window = browserWin;
           foundTab.browser = tabbrowser;
           foundTab.tab = tabbrowser.tabContainer.childNodes[index];
