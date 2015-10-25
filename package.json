@@ -4,7 +4,14 @@
   "id": "jid1-EiGVwBQPlbKeZA",
   "description": "Show browsing history in threads.",
   "icon": "chrome/content/toolbar-button/icon128.png",
+  "preferences": [{
+    "description": "Open History in Threads sidebar with the same hotkey of built-in history sidebar",
+    "type": "bool",
+    "name": "replaceBuiltinHistory",
+    "value": false,
+    "title": "Override hotkey (tested in Windows, Linux, Mac)"
+}],
   "author": "Xuan Wu",
   "license": "MPL 2.0",
-  "version": "1.9"
+  "version": "1.10"
 }
