@@ -30,25 +30,8 @@ com.wuxuan.fromwheretowhere.mainView = function(){
     if(this.visibleData!=null){
         lastVisibleLen = this.visibleData.length;
     }
-    var newNodes = Application.storage.get("fromwheretowhere.currentData", false);
-    //ugly solution for passing the nodes from sidebar to main TV:
-    //always make sure this "global" currentData is reset every time after the treeview.js loads visibleData from it
-    Application.storage.set("fromwheretowhere.currentData", false);
     if(treeBox!=null){
       this.treeBox = treeBox;
-    }else{
-      Application.storage.set("currentURI", "");
-    }
-    //refresh the tree
-    //what's this for??
-    if(newNodes.length>0){
-      this.visibleData = [];
-      this.treeBox.rowCountChanged(0, -1);
-    }
-    //??
-    for (var i = 0; i < newNodes.length; i++) {
-      newNodes[i]=main.putNodeToLevel0(newNodes[i]);
-      this.visibleData.splice(this.visibleData.length, 0, newNodes[i]);
     }
     this.treeBox.rowCountChanged(lastVisibleLen,this.visibleData.length-lastVisibleLen+1);
   },

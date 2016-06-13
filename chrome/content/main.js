@@ -1,5 +1,6 @@
 
 com.wuxuan.fromwheretowhere.main = function(){
+
   var pub={};
 
 	// Get a reference to the strings bundle
@@ -49,7 +50,6 @@ com.wuxuan.fromwheretowhere.main = function(){
 	pub.DEBUG = false;
   // Utils functions finish
   pub.keywords = "";
-  pub.currentURI = Application.storage.get("currentURI", false);
 
 	//if a node's level==0, seen as start of a session
 	pub.isNewSession = function(item){
@@ -103,7 +103,7 @@ com.wuxuan.fromwheretowhere.main = function(){
     }
     return selected;
   };
-  
+		
   pub.pidwithKeywords = [];
   	
 	//TODO: call getIncludeExclude here, save passing arguments?
@@ -145,11 +145,10 @@ com.wuxuan.fromwheretowhere.main = function(){
   	if(event!=null){
   	  period = event.target.getAttribute("id");
   	}
-  	
+
     pub.treeView.treeBox.rowCountChanged(0, -pub.treeView.visibleData.length);
     pub.query = document.getElementById("keywords").value;
     pub.main.dispatch(new pub.searchThread(1, {keyword: pub.query, period: period}), pub.main.DISPATCH_NORMAL);
-    Application.storage.set("currentURI", "");
   };
 
 	pub.findNext = function(){
@@ -192,7 +191,6 @@ com.wuxuan.fromwheretowhere.main = function(){
         .getInterface(Components.interfaces.nsIDOMWindow);
  
   pub.init = function() {
-      
     pub.aserv=Components.classes["@mozilla.org/atom-service;1"].
                 getService(Components.interfaces.nsIAtomService);
     pub.main = Components.classes["@mozilla.org/thread-manager;1"].getService().mainThread;
@@ -200,6 +198,6 @@ com.wuxuan.fromwheretowhere.main = function(){
 	pub.history = com.wuxuan.fromwheretowhere.historyQuery;
 	pub.UIutils = com.wuxuan.fromwheretowhere.UIutils;
   }
-  
+
   return pub;
 }();
