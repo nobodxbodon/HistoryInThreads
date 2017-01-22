@@ -4,8 +4,9 @@
   "id": "jid1-EiGVwBQPlbKeZA@jetpack",
   "main": "lib/main.js",
   "description": "Show browsing history in threads.",
-  "multiprocessCompatible": true,
-  "icon": "chrome/content/toolbar-button/icon128.png",
+  "permissions": {
+    "multiprocess": true
+  },
   "preferences": [{
     "description": "Open History in Threads sidebar with the same hotkey of built-in history sidebar",
     "type": "bool",
@@ -15,5 +16,5 @@
 }],
   "author": "Xuan Wu",
   "license": "MPL 2.0",
-  "version": "1.10.2"
+  "version": "1.10.3"
 }
