@@ -1,5 +1,5 @@
 # NOTE: this version is deprecated, as Firefox doesn't support XUL extension starting from 57.0. 
-New version please check https://github.com/program-in-chinese/HistoryInThreads_WebExtension
+## New version please check [here](https://github.com/program-in-chinese/HistoryInThreads_WebExtension). 
 
 Select time range from Today, Yesterday, Last 7 days, This month, This year, All (default is Today). Search terms take effect when the time range is changed.
 
